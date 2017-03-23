@@ -1,7 +1,5 @@
 site_name: 笔记
 pages:
-    - index : index.md
-    - about : about.md
-    - microservice : microservice.md
-    - restfulApi : restfulapi.md
+    - 微服务 : microservice.md
+    - restfulApi规范 : restfulapi.md
 theme: readthedocs
