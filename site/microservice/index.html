@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>microservice - 笔记</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "microservice";
+    var mkdocs_page_input_path = "microservice.md";
+    var mkdocs_page_url = "/microservice/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> 笔记</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">index</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../about/">about</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">microservice</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#architecture">architecture</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#spring-boot">spring-boot</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#spring-cloud">spring-cloud</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#config">config</a></li>
+                
+                    <li><a class="toctree-l4" href="#configserver">configServer</a></li>
+                
+                    <li><a class="toctree-l4" href="#configclient">configClient</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#feign">feign</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#ribbon">ribbon</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#hystrix">hystrix</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#zuul">zuul</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#eureka">eureka</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#consul">consul</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../restfulapi/">restfulApi</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">笔记</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>microservice</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="architecture">architecture</h2>
+<hr />
+<p><img alt="" src="../images/microservice.png" /></p>
+<h2 id="spring-boot">spring-boot</h2>
+<hr />
+<ul>
+<li>结合maven/gradle构建spring-boot项目</li>
+<li>构建的时候加入spring-boot的pom支持</li>
+</ul>
+<pre><code>    &lt;!-- Inherit defaults from Spring Boot --&gt;
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;2.0.0.BUILD-SNAPSHOT&lt;/version&gt;
+    &lt;/parent&gt;
+
+    &lt;!-- Add typical dependencies for a web application --&gt;
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;!-- Package as an executable jar --&gt;
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+</code></pre>
+
+<ul>
+<li>项目目录结构</li>
+</ul>
+<p><img alt="" src="../images/promenu.png" /></p>
+<ul>
+<li>完善项目信息<ul>
+<li>在main目录下新建resources目录</li>
+<li>增加application.properties文件</li>
+<li>在application.properties中增加如下内容</li>
+</ul>
+</li>
+</ul>
+<pre><code>spring.application.name=test
+server.port=9009
+
+logging.path=./data/logs/
+logging.level.root=debug
+</code></pre>
+
+<ul>
+<li>增加spring-boot的启动支持</li>
+</ul>
+<pre><code>@SpringBootApplication
+public class App {
+    public static void main( String[] args ) {
+        SpringApplication.run(App.class,args);
+    }
+}
+</code></pre>
+
+<ul>
+<li>创建restful接口</li>
+</ul>
+<pre><code>@RestController
+@Slf4j
+public class Demo {
+
+    @GetMapping(value = &quot;/demo&quot;)
+    public String demo(){
+        log.info(&quot;demo&quot;);
+        return &quot;demo&quot;;
+    }
+
+}     
+</code></pre>
+
+<ul>
+<li>中间需要加入slf4j的配置文件。启动springboot的应用，通过postman即可访问
+<img alt="" src="../images/postman.png" /></li>
+</ul>
+<h2 id="spring-cloud">spring-cloud</h2>
+<ul>
+<li>项目加入springcloud的支持(结合consul)</li>
+</ul>
+<pre><code>&lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-cloud-starter&lt;/artifactId&gt;
+      &lt;version&gt;1.1.7.RELEASE&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+      &lt;version&gt;Camden.SR5&lt;/version&gt;
+    &lt;/dependency&gt;
+
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-cloud-starter-consul-discovery&lt;/artifactId&gt;
+      &lt;version&gt;1.1.2.RELEASE&lt;/version&gt;
+    &lt;/dependency&gt;
+</code></pre>
+
+<ul>
+<li>启动增加服务注册和发现的注解</li>
+</ul>
+<pre><code>@SpringBootApplication
+@EnableDiscoveryClient
+public class App {
+    public static void main( String[] args ) {
+        SpringApplication.run(App.class,args);
+    }
+}
+</code></pre>
+
+<ul>
+<li>springcloud的上下文环境是整个bootapplication的父环境</li>
+</ul>
+<pre><code>A Spring Cloud application operates by creating a &quot;bootstrap&quot; context, which is a parent context for the main application. Out of the box it is responsible for loading configuration properties from the external sources, and also decrypting properties in the local external configuration files. The two contexts share an Environment which is the source of external properties for any Spring application. Bootstrap properties are added with high precedence, so they cannot be overridden by local configuration, by default.
+The bootstrap context uses a different convention for locating external configuration than the main application context, so instead of application.yml (or .properties) you use bootstrap.yml, keeping the external configuration for bootstrap and main context nicely separate
+</code></pre>
+
+<ul>
+<li>增加bootstrap.properties配置文件</li>
+</ul>
+<pre><code>spring.application.name=test
+server.port=9009
+</code></pre>
+
+<ul>
+<li>在application.properties中增加consul注册中心</li>
+</ul>
+<pre><code>spring.cloud.consul.host=localhost
+spring.cloud.consul.port=8500
+spring.cloud.consul.enabled=true
+spring.cloud.consul.discovery.prefer-ip-address=true
+spring.cloud.consul.discovery.instance-id=${spring.application.name}:${spring.cloud.client.ipAddress}:${server.port}
+</code></pre>
+
+<ul>
+<li>启动应用，登陆consul控制台，发现consul的服务critical</li>
+</ul>
+<p><img alt="" src="../images/consul.png" /></p>
+<ul>
+<li>那是因为没有启动springboot的</li>
+</ul>
+<pre><code>    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+      &lt;version&gt;1.4.4.RELEASE&lt;/version&gt;
+    &lt;/dependency&gt;
+</code></pre>
+
+<ul>
+<li>
+<p>重新启动服务后正常
+<img alt="" src="../images/normal.png" /></p>
+</li>
+<li>
+<p>说明：常规服务注册是通过client注册到server上。本示例直接注册到server。不符合consul的架构原则。</p>
+</li>
+</ul>
+<h2 id="config">config</h2>
+<p><img alt="" src="../images/config.png" /></p>
+<pre><code>Spring Cloud Config provides server and client-side support for externalized configuration in a distributed system.
+</code></pre>
+
+<h3 id="configserver">configServer</h3>
+<ul>
+<li>
+<p>configServer是一个springboot项目。部署有两种方式：</p>
+<ul>
+<li>集群的方式部署，前端加nginx。</li>
+<li>服务注册的方式进行部署，注册到consul。configClient通过服务发现的方式调用。</li>
+</ul>
+</li>
+<li>
+<p>代码的托管可以采用git或者svn的方式</p>
+</li>
+</ul>
+<pre><code>spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/spring-cloud-samples/config-repo
+          username: trolley
+          password: strongpassword
+</code></pre>
+
+<ul>
+<li>bootstrap启动的时候如下</li>
+</ul>
+<pre><code>@SpringBootApplication
+@EnableConfigServer
+public class ConfigServer {
+  public static void main(String[] args) {
+    SpringApplication.run(ConfigServer.class, args);
+  }
+}
+</code></pre>
+
+<ul>
+<li>
+<p>如果采用服务注册的方式，那么需要引入consul或者eureka组件。</p>
+</li>
+<li>
+<p><strong> Force pull in Git Repositories </strong></p>
+<ul>
+<li>请参照http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html</li>
+</ul>
+</li>
+</ul>
+<pre><code>As mentioned before Spring Cloud Config Server makes a clone of the remote git repository and if somehow the local copy gets dirty (e.g. folder content changes by OS process) so Spring Cloud Config Server cannot update the local copy from remote repository.
+To solve this there is a force-pull property that will make Spring Cloud Config Server force pull from remote repository if the local copy is dirty. Example:
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/spring-cloud-samples/config-repo
+          force-pull: true
+</code></pre>
+
+<h3 id="configclient">configClient</h3>
+<ul>
+<li>请参照http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html#_spring_cloud_config_client</li>
+<li><strong> Config First Bootstrap </strong> 待续。。。。</li>
+<li><strong> Discovery First Bootstrap </strong> 待续。。。。</li>
+<li><strong> Config Client Fail Fast </strong>。待续。。。。</li>
+<li>
+<p><strong> Config Client Retry </strong>   待续。。。。</p>
+</li>
+<li>
+<p>分布式刷新：采用cloud-bus的形式;cloud-bus可以用消息队列来实现。</p>
+<ul>
+<li>在客户端需要开启@Refreshscope注解。</li>
+</ul>
+</li>
+<li>在bootstrap.properties文件中增加注解</li>
+</ul>
+<pre><code>#config
+spring.cloud.config.enabled=false
+spring.cloud.config.discovery.enabled=${spring.cloud.config.enabled}
+spring.cloud.config.discovery.service-id=ppdai-config-server
+spring.cloud.config.fail-fast=true
+</code></pre>
+
+<h2 id="feign">feign</h2>
+<pre><code>Feign is a declarative web service client. It makes writing web service clients easier. To use Feign create an interface and annotate it. It has pluggable annotation support including Feign annotations and JAX-RS annotations. Feign also supports pluggable encoders and decoders. Spring Cloud adds support for Spring MVC annotations and for using the same HttpMessageConverters used by default in Spring Web. Spring Cloud integrates Ribbon and Eureka to provide a load balanced http client when using Feign.
+</code></pre>
+
+<ul>
+<li>feign是一个声明式的客户端，springcloud的feign-client包含了ribbon和hystrix的支持</li>
+<li>引入feign</li>
+</ul>
+<pre><code>    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-cloud-starter-feign&lt;/artifactId&gt;
+      &lt;version&gt;1.2.3.RELEASE&lt;/version&gt;
+    &lt;/dependency&gt;
+</code></pre>
+
+<ul>
+<li>项目启动增加feignclient的支持</li>
+</ul>
+<pre><code>@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients
+public class App {
+    public static void main( String[] args ) {
+        SpringApplication.run(App.class,args);
+    }
+}
+</code></pre>
+
+<ul>
+<li>增加client的目录，创建consumer的interface</li>
+</ul>
+<pre><code>@FeignClient(value = &quot;xzxxxx&quot;)
+public interface Demoa {
+
+    @GetMapping(value = &quot;/demo&quot;)
+    public String demo();
+
+}
+## value:所要调用的服务的名字。
+</code></pre>
+
+<ul>
+<li>
+<p>项目启动的时候会,context会实例化Demoa(singleton-&gt;FeignClientFactoryBean)
+<img alt="" src="../images/feign-instance.png" />
+<img alt="" src="../images/feign-last.png" /></p>
+</li>
+<li>
+<p>feign存在重试:连接超时默认是10s，读取超时默认是60s，如果读取超时，这个时候会进行重试，并调用ribbo组件进行负载均衡，并发送请求。因此，在项目中注意，需要关闭底层的httpclient或者okhttpclient的重试，防止在通讯层出现重发。在服务端也要做好幂等。
+<img alt="" src="../images/feign-retry.png" /></p>
+</li>
+<li>
+<p>在controller中可以直接注入Demoa实例</p>
+</li>
+</ul>
+<pre><code>@RestController
+@Slf4j
+public class Demo {
+
+    @Autowired
+    Demoa demoa;
+
+    @GetMapping(value = &quot;/demo&quot;)
+    public String demo(){
+        log.info(&quot;demo&quot;);
+        return &quot;demo&quot;;
+    }
+
+}
+</code></pre>
+
+<h2 id="ribbon">ribbon</h2>
+<p>Ribbon is a client side load balancer which gives you a lot of control over the behaviour of HTTP and TCP clients. Feign already uses Ribbon, so if you are using @FeignClient then this section also applies.</p>
+<ul>
+<li>源码解析查看http://www.tuicool.com/articles/7VJzq2U</li>
+<li>源码解析查看http://www.tuicool.com/articles/vANVFnM
+<img alt="" src="../images/ribbon-lb.png" /></li>
+</ul>
+<h2 id="hystrix">hystrix</h2>
+<h2 id="zuul">zuul</h2>
+<h2 id="eureka">eureka</h2>
+<h2 id="consul">consul</h2>
+<ul>
+<li>consul参考官网http://consul.io</li>
+<li>consul架构图
+<img alt="" src="../images/consul-archi.png" /></li>
+</ul>
+<pre><code>(LAN:局域网 ;WAN:广域网)
+client与client之间走gossip协议，协议端口是8301
+client与server之间数据同步也是走gossip协议，端口是8301
+client与server的rpc走tcp协议，走的是8300端口
+server与server之间的复制raft协议走的是tcp协议，端口是8300
+不同的dc之间的数据请求走的是8300端口
+不同的dc的server之间走的gossip协议，端口广域网的8302端口
+</code></pre>
+
+<ul>
+<li>gossip协议</li>
+</ul>
+<pre><code>1. gossip背景
+Gossip算法如其名，灵感来自办公室八卦，只要一个人八卦一下，在有限的时间内所有的人都会知道该八卦的信息，这种方式也与病毒传播类似，因此Gossip有众多的别名“闲话算法”、“疫情传播算法”、“病毒感染算法”、“谣言传播算法”。  但Gossip并不是一个新东西，之前的泛洪查找、路由算法都归属于这个范畴，不同的是Gossip给这类算法提供了明确的语义、具体实施方法及收敛性证明。
+2. gossip特点
+Gossip算法又被称为反熵（Anti-Entropy），熵是物理学上的一个概念，代表杂乱无章，而反熵就是在杂乱无章中寻求一致，这充分说明了Gossip的特点：在一个有界网络中，每个节点都随机地与其他节点通信，经过一番杂乱无章的通信，最终所有节点的状态都会达成一致。每个节点可能知道所有其他节点，也可能仅知道几个邻居节点，只要这些节可以通过网络连通，最终他们的状态都是一致的，当然这也是疫情传播的特点。  要注意到的一点是，即使有的节点因宕机而重启，有新节点加入，但经过一段时间后，这些节点的状态也会与其他节点达成一致，也就是说，Gossip天然具有分布式容错的优点
+3. gossip本质
+Gossip是一个带冗余的容错算法，更进一步，Gossip是一个最终一致性算法。虽然无法保证在某个时刻所有节点状态一致，但可以保证在”最终“所有节点一致，”最终“是一个现实中存在，但理论上无法证明的时间点。
+因为Gossip不要求节点知道所有其他节点，因此又具有去中心化的特点，节点之间完全对等，不需要任何的中心节点。实际上Gossip可以用于众多能接受“最终一致性”的领域：失败检测、路由同步、Pub/Sub、动态负载均衡。  但Gossip的缺点也很明显，冗余通信会对网路带宽、CUP资源造成很大的负载，而这些负载又受限于通信频率，该频率又影响着算法收敛的速度，后面我们会讲在各种场合下的优化方法。
+4. Gossip节点的通信方式及收敛性 
+参照：http://wenku.baidu.com/link?url=SSCHAAXypcJvYrDkZL4RRUSMgxeQl9nb1EOaLBsk21PyB1Z9GfXsQ2jkVTDElRJwqUn2QFxV6ut-5Dz1Dki8Rt34BOSAEoXH-YQ-1ZTm46O
+</code></pre>
+
+<ul>
+<li>
+<p>consul的部署</p>
+<ul>
+<li>根据不同的的操作系统版本，下载最新consul客户端,最新的版本集成了web-ui,只要在部署的开启ui即可。</li>
+<li>
+<p>‘单机部署’</p>
+<ul>
+<li>下载consul安装文件。</li>
+<li>准备启动脚本</li>
+</ul>
+<p><code>consul agent -server -bootstrap -datacenter=zjtest1 -data-dir=./temp/consul/server -ui=true</code></p>
+<ul>
+<li>启动脚本说明<ul>
+<li>server:  This indicates whether the agent is running in server or client mode</li>
+<li>bootstrap:   a server may be in "bootstrap" mode </li>
+<li>datacenter:  The -datacenter flag can be used to set the datacenter</li>
+</ul>
+</li>
+<li>启动日志</li>
+</ul>
+<p><code>2017/03/23 15:55:40 [WARN] raft: Heartbeat timeout from "" reached, starting Election
+    2017/03/23 15:55:40 [INFO] raft: Node at 192.168.50.150:8300 [Candidate] entering Candidate state in term 2
+    2017/03/23 15:55:40 [INFO] raft: Election won. Tally: 1
+    2017/03/23 15:55:40 [INFO] raft: Node at 192.168.50.150:8300 [Leader] entering Leader state
+    2017/03/23 15:55:40 [INFO] consul: cluster leadership acquired
+    2017/03/23 15:55:40 [INFO] consul: New leader elected: JundeMacBook-Pro.local
+    2017/03/23 15:55:40 [INFO] consul: member 'JundeMacBook-Pro.local' joined, marking health alive
+    2017/03/23 15:55:42 [INFO] agent: Synced service 'consul'</code></p>
+<ul>
+<li>部署完成后可以查看</li>
+</ul>
+<p><code>$ consul members
+Node                    Address              Status  Type    Build  Protocol  DC
+JundeMacBook-Pro.local  192.168.50.150:8301  alive   server  0.7.2  2         zjtest2</code></p>
+</li>
+<li>
+<p>集群部署</p>
+<ul>
+<li>server建议至少三个点部署。</li>
+<li>所有的server不能以bootstrap的方式运行，否则会产生状态的不一致，如下引用原文说明</li>
+</ul>
+<p><code>Multiple servers cannot be in bootstrap mode as that would put the cluster in an inconsistent state.</code></p>
+<ul>
+<li>
+<p>部署步骤</p>
+<ul>
+<li>以bootstrap方式部署一台server    </li>
+<li>其他server以join的方式加入</li>
+<li>优雅下线该bootstrap的server</li>
+<li>加入到剩余中的任意一台</li>
+</ul>
+</li>
+<li>
+<p>部署完成后，可以通过consul members进行查看集群状态</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../restfulapi/" class="btn btn-neutral float-right" title="restfulApi">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../about/" class="btn btn-neutral" title="about"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../about/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../restfulapi/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>
