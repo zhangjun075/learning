@@ -1,4 +1,4 @@
-site_name: 笔记
+site_name: 张均的笔记
 pages:
     - index : index.md
     - 微服务 : microservice.md
