@@ -2,13 +2,13 @@
     "docs": [
         {
             "location": "/", 
-            "text": "Welcome to MkDocs", 
+            "text": "Welcome to \u5f20\u5747\u7684\u7b14\u8bb0", 
             "title": "index"
         }, 
         {
-            "location": "/#welcome-to-mkdocs", 
+            "location": "/#welcome-to", 
             "text": "", 
-            "title": "Welcome to MkDocs"
+            "title": "Welcome to \u5f20\u5747\u7684\u7b14\u8bb0"
         }, 
         {
             "location": "/microservice/", 
