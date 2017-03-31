@@ -3,4 +3,5 @@ pages:
     - index : index.md
     - 微服务 : microservice.md
     - restfulApi规范 : restfulapi.md
+    - 设计模式 : designPattern.md
 theme: readthedocs
