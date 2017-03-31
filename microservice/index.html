@@ -87,6 +87,9 @@
                 <li class="toctree-l3"><a href="#zuul">zuul</a></li>
                 
             
+                <li class="toctree-l3"><a href="#archaius">Archaius</a></li>
+                
+            
                 <li class="toctree-l3"><a href="#eureka">eureka</a></li>
                 
             
@@ -101,6 +104,13 @@
             <li>
     <li class="toctree-l1 ">
         <a class="" href="../restfulapi/">restfulApi规范</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../designPattern/">设计模式</a>
         
     </li>
 <li>
@@ -442,8 +452,26 @@ public interface Demoa {
 <img alt="" src="../images/feign-retry.png" /></p>
 </li>
 <li>
-<p>在controller中可以直接注入Demoa实例</p>
+<p>feign的超时重试机制在全局进行关闭</p>
 </li>
+</ul>
+<pre><code>public class DemoApplicationBootup {
+    public static void main(String[] args){
+        SpringApplication.run(DemoApplicationBootup.class,args);
+    }
+    @Bean
+    public Retryer retryer() {
+        return Retryer.NEVER_RETRY;
+    }
+    @Bean
+    Request.Options feignOptions() {
+        return new Request.Options(/**connectTimeoutMillis**/4 * 1000, /** readTimeoutMillis **/ 10* 1000);
+    }
+}
+</code></pre>
+
+<ul>
+<li>在controller中可以直接注入Demoa实例</li>
 </ul>
 <pre><code>@RestController
 @Slf4j
@@ -462,15 +490,244 @@ public class Demo {
 </code></pre>
 
 <h2 id="ribbon">ribbon</h2>
-<p>Ribbon is a client side load balancer which gives you a lot of control over the behaviour of HTTP and TCP clients. Feign already uses Ribbon, so if you are using @FeignClient then this section also applies.</p>
+<p>Ribbon is a client side load balancer which gives you a lot of control over the behaviour of HTTP and TCP clients. Feign already uses Ribbon, so if you are using @FeignClient then this section also applies.
+A central concept in Ribbon is that of the named client. Each load balancer is part of an ensemble of components that work together to contact a remote server on demand, and the ensemble has a name that you give it as an application developer (e.g. using the @FeignClient annotation). Spring Cloud creates a new ensemble as an ApplicationContext on demand for each named client using <strong> RibbonClientConfiguration </strong>. This contains (amongst other things) an ILoadBalancer, a RestClient, and a ServerListFilter.</p>
 <ul>
 <li>源码解析查看http://www.tuicool.com/articles/7VJzq2U</li>
 <li>源码解析查看http://www.tuicool.com/articles/vANVFnM
 <img alt="" src="../images/ribbon-lb.png" /></li>
 </ul>
 <h2 id="hystrix">hystrix</h2>
+<p><img alt="" src="../images/hystrix-dataflow.png" />
+* feign中已经包含了hystrix的支持，在启动的pom中加入hystrix</p>
+<pre><code>    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-cloud-starter-hystrix&lt;/artifactId&gt;
+      &lt;version&gt;RELEASE&lt;/version&gt;
+    &lt;/dependency&gt;
+</code></pre>
+
+<ul>
+<li>hystrix支持两种模式进行隔离<ul>
+<li>线程池模式</li>
+<li>信号量模式</li>
+</ul>
+</li>
+<li>线程池模式：在方法上加如下代码</li>
+</ul>
+<pre><code>@HystrixCommand(threadPoolKey = &quot;hellopool&quot;,
+            fallbackMethod = &quot;test&quot;,
+            commandProperties = {
+                    @HystrixProperty(name = &quot;execution.isolation.thread.timeoutInMilliseconds&quot;, value = &quot;2000&quot;),
+                    @HystrixProperty(name = &quot;metrics.rollingStats.numBuckets&quot;, value = &quot;10&quot;),
+                    @HystrixProperty(name = &quot;metrics.rollingStats.timeInMilliseconds&quot;, value = &quot;10000&quot;),
+                    @HystrixProperty(name = &quot;circuitBreaker.enabled&quot;, value = &quot;true&quot;),
+                    @HystrixProperty(name = &quot;circuitBreaker.requestVolumeThreshold&quot;, value = &quot;5&quot;),
+                    @HystrixProperty(name = &quot;circuitBreaker.sleepWindowInMilliseconds&quot;, value = &quot;10000&quot;)
+            })
+    public String hello(){
+        log.info(&quot;thrad local&quot;,String.valueOf(threadLocal.get()));
+        return demoClient.hello();
+    }
+    public String test(){
+        log.info(&quot;thrad local&quot;,String.valueOf(threadLocal.get()));
+        return &quot;fallback-cccccc&quot;;
+    }
+</code></pre>
+
+<ul>
+<li>启动加载日志如下
+<img alt="" src="../images/hystrix_thread.png" /></li>
+<li>解析如下<ul>
+<li>circuitBreaker.enabled：断路器开关，用来检测服务的是否健康，在断路器跳闸的情况下短路请求<ul>
+<li>hystrix.command.HystrixCommandKey.circuitBreaker.enabled</li>
+</ul>
+</li>
+<li>circuitBreaker.requestVolumeThreshold：最小请求数，用来跳闸回路。举个栗子，如果设置了20，就算19个请求都失败了也不会跳闸。</li>
+<li>circuitBreaker.sleepWindowInMilliseconds：跳闸后，到下次短路判定的间隔时间</li>
+<li>hystrix在用的时候，需要关闭feign的重试策略.具体关闭方法见feign描述。</li>
+<li>全局的超时可以用hystrix来控制，该超时的优先级最高，是全局的。
+<img alt="" src="../images/all-to.png" /></li>
+<li>在全局的超时下，对于某个方法，可以用hystrix进行超时的控制：<ul>
+<li>execution.timeout.enabled</li>
+<li>execution.isolation.thread.timeoutInMilliseconds</li>
+<li>fallback.enabled(hystrix.command.default.fallback.enabled)</li>
+<li>hystrix.threadpool.default.coreSize=2：核心线程池size。HystrixCommands可以并发执行的最大数量。</li>
+<li>hystrix.threadpool.default.maxQueueSize=-1：默认-1，使用SynchronousQueue。其他正数则使用LinkedBlockingQueue。队列大小在初始化时候生效，如果要动态改变队列大小参考queueSizeRejectionThreshold参数。如果要在SynchronousQueue 和LinkedBlockingQueue之间切换需要重新启动，以为着改变了队列大小并不改变当前的队列实现。
+<img alt="" src="../images/parralel.png" /></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>如果采用semaphore的方式，那么是同步的方式，thread.timeout不起作用。</li>
+</ul>
 <h2 id="zuul">zuul</h2>
+<p><strong> Router and Filter </strong></p>
+<pre><code>Routing in an integral part of a microservice architecture. For example, / may be mapped to your web application, /api/users is mapped to the user service and /api/shop is mapped to the shop service. Zuul is a JVM based router and server side load balancer by Netflix.
+</code></pre>
+
+<h2 id="archaius">Archaius</h2>
 <h2 id="eureka">eureka</h2>
+<ul>
+<li><strong> eureka server </strong></li>
+<li>pom.xml:</li>
+</ul>
+<pre><code>    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;1.4.3.RELEASE&lt;/version&gt;
+        &lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
+    &lt;/parent&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-eureka-server&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+                &lt;version&gt;Brixton.RELEASE&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+
+    &lt;properties&gt;
+        &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+        &lt;start-class&gt;eurekademo.EurekaApplication&lt;/start-class&gt;
+        &lt;java.version&gt;1.8&lt;/java.version&gt;
+        &lt;docker.image.prefix&gt;springcloud&lt;/docker.image.prefix&gt;
+    &lt;/properties&gt;
+</code></pre>
+
+<ul>
+<li>启动类</li>
+</ul>
+<pre><code>@SpringBootApplication
+@EnableEurekaServer
+public class EurekaApplication {
+
+    public static void main(String[] args){
+        new SpringApplicationBuilder(EurekaApplication.class).web(true).run(args);
+    }
+
+}
+</code></pre>
+
+<ul>
+<li>配置文件application.yml</li>
+</ul>
+<pre><code>server:
+  port: 8761
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: false #是否将eureka自身作为应用注册到eureka注册中心
+    fetchRegistry: false #表示是否从eureka服务器获取注册信
+    serviceUrl:
+      defaultZone: http://localhost:${server.port}/eureka/  #设置eureka服务器所在的地址，查询服务和注册服务都需要依赖这个地址
+  server:
+    enable-self-preservation: false #是否开启自我保护(是否会清除已经下线的服务)
+</code></pre>
+
+<ul>
+<li>配置文件bootstrap.yml</li>
+</ul>
+<pre><code>spring:
+  application:
+    name: eureka
+</code></pre>
+
+<ul>
+<li>在server启动的时候，有个自我保护的选项需要注意下，默认是关闭的，下线的服务在catalog中不会自动清除，在eureka的控制台会有警告。可以通过如下关闭：</li>
+</ul>
+<pre><code>eureka:
+    server:
+        enable-self-preservation: false
+</code></pre>
+
+<ul>
+<li>
+<p>eureka可以采取集群部署的方式</p>
+</li>
+<li>
+<p><strong> eureka client </strong></p>
+</li>
+<li>pom文件引入</li>
+</ul>
+<pre><code>&lt;parent&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+    &lt;version&gt;1.4.5.RELEASE&lt;/version&gt;
+  &lt;/parent&gt;
+
+  &lt;groupId&gt;com.ppdai.erueka_client&lt;/groupId&gt;
+  &lt;artifactId&gt;eureka_client&lt;/artifactId&gt;
+  &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+  &lt;packaging&gt;jar&lt;/packaging&gt;
+
+  &lt;name&gt;eureka_client&lt;/name&gt;
+
+  &lt;properties&gt;
+    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+    &lt;java.version&gt;1.8&lt;/java.version&gt;
+  &lt;/properties&gt;
+
+
+  &lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+      &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+        &lt;version&gt;Camden.SR6&lt;/version&gt;
+        &lt;type&gt;pom&lt;/type&gt;
+        &lt;scope&gt;import&lt;/scope&gt;
+      &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+  &lt;/dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-cloud-starter-eureka&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-boot-configuration-processor&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;junit&lt;/groupId&gt;
+      &lt;artifactId&gt;junit&lt;/artifactId&gt;
+      &lt;version&gt;4.12&lt;/version&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+</code></pre>
+
+<ul>
+<li>启动类:(i.e. utterly normal Spring Boot app). In this example we use @EnableEurekaClient explicitly, but with only Eureka available you could also use @EnableDiscoveryClient. Configuration is required to locate the Eureka server</li>
+</ul>
+<pre><code>@SpringBootApplication
+@EnableEurekaClient
+@EnableDiscoveryClient
+public class App {
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(App.class).web(true).run(args);
+    }
+}
+</code></pre>
+
 <h2 id="consul">consul</h2>
 <ul>
 <li>consul参考官网http://consul.io</li>
