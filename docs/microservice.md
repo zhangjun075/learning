@@ -456,6 +456,11 @@ eureka:
 
 * eureka可以采取集群部署的方式
 
+
+* docker结合:在项目main目录下建立docker目录，新增Dockerfile文件
+![](images/eureka-docker.png)
+
+
 * ** eureka client **
 * pom文件引入
 ```
