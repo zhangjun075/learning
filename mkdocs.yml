@@ -7,4 +7,9 @@ pages:
     - docker : docker.md
     - 令牌桶 : limiting.md
     - 多线程 : thread.md
+    - lambda : lambda.md
+    - JSR310-日期 : JSR310.md
+    - jvm及GC : gc.md
+    - db事务 : trans.md
+    - springboot : springboot.md
 theme: readthedocs

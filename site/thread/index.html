@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>多线程 - 张均的笔记</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "\u591a\u7ebf\u7a0b";
+    var mkdocs_page_input_path = "thread.md";
+    var mkdocs_page_url = "/thread/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> 张均的笔记</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">index</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../microservice/">微服务</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../restfulapi/">restfulApi规范</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../designPattern/">设计模式</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../docker/">docker</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../limiting/">令牌桶</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">多线程</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#exchanger">exchanger</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#delayqueue">DelayQueue</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#priorityblockingqueue">PriorityBlockingQueue</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#_1">免锁容器</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">张均的笔记</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>多线程</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="exchanger">exchanger</h1>
+<p>Exchanger可以在两个线程之间交换数据，只能是2个线程，他不支持更多的线程之间互换数据。</p>
+<p>当线程A调用Exchange对象的exchange()方法后，他会陷入阻塞状态，直到线程B也调用了exchange()方法，然后以线程安全的方式交换数据，之后线程A和B继续运行</p>
+<pre><code>package com.java.exchanger;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.Exchanger;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Created by junzhang on 2017/4/7.
+ */
+public class ExchangerTest {
+    public static void main(String[] args) {
+        ExchangerTest exchangerTest = new ExchangerTest();
+        Exchanger&lt;List&lt;Integer&gt;&gt; exchanger = new Exchanger&lt;&gt;();
+        exchangerTest.new E_Consumer(exchanger).start();
+        exchangerTest.new E_Producer(exchanger).start();
+    }
+
+
+    class E_Producer extends Thread {
+        List&lt;Integer&gt; list = new ArrayList&lt;Integer&gt;();
+        Exchanger&lt;List&lt;Integer&gt;&gt; exchanger = null;
+
+        public E_Producer(Exchanger&lt;List&lt;Integer&gt;&gt; exchanger) {
+            this.exchanger = exchanger;
+        }
+
+        @Override
+        public void run() {
+            Random rand = new Random();
+            for(int i=0; i&lt;10; i++) {
+                list.clear();
+                list.add(rand.nextInt(10000));
+                list.add(rand.nextInt(10000));
+                list.add(rand.nextInt(10000));
+                list.add(rand.nextInt(10000));
+                list.add(rand.nextInt(10000));
+                try {
+                    list = exchanger.exchange(list);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+
+    class E_Consumer extends Thread{
+        List&lt;Integer&gt; list = new ArrayList&lt;&gt;();
+        Exchanger&lt;List&lt;Integer&gt;&gt; exchanger = null;
+        public E_Consumer(Exchanger&lt;List&lt;Integer&gt;&gt; exchanger) {
+            super();
+            this.exchanger = exchanger;
+        }
+        @Override
+        public void run() {
+            for(int i=0; i&lt;10; i++) {
+                try {
+                    list = exchanger.exchange(list);
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                System.out.print(list.get(0)+&quot;, &quot;);
+                System.out.print(list.get(1)+&quot;, &quot;);
+                System.out.print(list.get(2)+&quot;, &quot;);
+                System.out.print(list.get(3)+&quot;, &quot;);
+                System.out.println(list.get(4)+&quot;, &quot;);
+            }
+        }
+    }
+
+}
+
+</code></pre>
+
+<h1 id="delayqueue">DelayQueue</h1>
+<p>这是一个无界的BlockingQueue,用于放置实现了Delayed接口的对象。</p>
+<h1 id="priorityblockingqueue">PriorityBlockingQueue</h1>
+<p>这是一个很基础的优先级队列，它具有可阻塞的读取操作。</p>
+<h1 id="_1">免锁容器</h1>
+<p>容器是所有变成中的基础工具，这其中自然也包括并发编程。出于这个原因，像vector和Hashtable这类早期容器具有许多synchronized方法，当他们用于非多线程的应用程序中时，便会导致不可接受的开销。java se5添加了一些新的容器，通过使用更灵巧的技术来消除加锁，从而提高线程安全的性能。</p>
+<p>这些免锁容器背后的通用策略是：对容器的修改可以与读取操作同时发生，只要读取者只能看到完成修改的结果即可。修改是在容器数据结构的某个部分的一个单独的副本(有时是整个数据结构的副本)上执行的，并且这个副本在修改过程中是不可视的。只有当修改完成时，被修改的结构才会自动地与主数据结构进行交换，之后读取者就可以看到这个修改了。</p>
+<p>在<strong>CopyOnWriteArrayList</strong>中，写入将导致创建整个底层数组的副本，而源数组将保留在原地。使得复制的数组在被修改时，读取操作可以安全的执行。当修改完成时，一个原子性的操作将把新的数组换入，使得新的读取操作可以看到这个新的修改。<strong>CopyOnWriteArrayList</strong>的好处之一是当多个迭代器同时遍历和修改这个列表时，不会抛出 <strong>ConcurrentModificationException</strong>,因此你不必编写特殊的代码去防范这种异常，就像你以前必须做的那样。</p>
+<p><strong>CopyOnWriteArraySet</strong>将使用<strong>CopyOnWriteArrayList</strong>来实现其免锁行为。</p>
+<p><strong>ConcurrentHashMap</strong>和<strong>ConcurrentLinkedQueue</strong>使用了类似的技术，允许并发的读取和写入，但是容器中只有部分内容而不是整个容器可以被复制和修改。然而，任何修改在完成之前，读取者仍旧不能看到他们。<strong>ConcurrentHashMap</strong>不会抛出<strong>ConcurrentModificationException</strong>异常。</p>
+<p>Java中，List在遍历的时候，如果被修改了会抛出java.util.ConcurrentModificationException错误。</p>
+<pre><code>import java.util.ArrayList;  
+import java.util.List;  
+
+public class Resource3 {  
+
+    public static void main(String[] args) throws InterruptedException {  
+        List&lt;String&gt; a = new ArrayList&lt;String&gt;();  
+        a.add(&quot;a&quot;);  
+        a.add(&quot;b&quot;);  
+        a.add(&quot;c&quot;);  
+        final ArrayList&lt;String&gt; list = new ArrayList&lt;String&gt;(  
+                a);  
+        Thread t = new Thread(new Runnable() {  
+            int count = -1;  
+
+            @Override  
+            public void run() {  
+                while (true) {  
+                    list.add(count++ + &quot;&quot;);  
+                }  
+            }  
+        });  
+        t.setDaemon(true);  
+        t.start();  
+        Thread.currentThread().sleep(3);  
+        for (String s : list) {  
+            System.out.println(s);  
+        }  
+    }  
+} 
+</code></pre>
+
+<pre><code>Exception in thread &quot;main&quot; java.util.ConcurrentModificationException
+    at java.util.ArrayList$Itr.checkForComodification(ArrayList.java:901)
+    at java.util.ArrayList$Itr.next(ArrayList.java:851)
+    at com.java.copyonwritelist.Resource.main(Resource.java:30)
+    at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+    at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+    at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+    at java.lang.reflect.Method.invoke(Method.java:498)
+    at com.intellij.rt.execution.application.AppMain.main(AppMain.java:147)
+</code></pre>
+
+<p>这段代码运行的时候就会抛出java.util.ConcurrentModificationException错误。这是因为主线程在遍历list的时候，子线程在向list中添加元素。
+那么有没有办法在遍历一个list的时候，还向list中添加元素呢？办法是有的。就是Java concurrent包中的CopyOnWriteArrayList。</p>
+<p>先解释下CopyOnWriteArrayList类。</p>
+<p>CopyOnWriteArrayList类最大的特点就是，在对其实例进行修改操作（add/remove等）会新建一个数据并修改，修改完毕之后，再将原来的引用指向新的数组。这样，修改过程没有修改原来的数组。也就没有了ConcurrentModificationException错误。</p>
+<pre><code>import java.util.ArrayList;  
+import java.util.List;  
+import java.util.concurrent.CopyOnWriteArrayList;  
+
+public class Resource3 {  
+
+    public static void main(String[] args) throws InterruptedException {  
+        List&lt;String&gt; a = new ArrayList&lt;String&gt;();  
+        a.add(&quot;a&quot;);  
+        a.add(&quot;b&quot;);  
+        a.add(&quot;c&quot;);  
+        final CopyOnWriteArrayList&lt;String&gt; list = new CopyOnWriteArrayList&lt;String&gt;(a);  
+        Thread t = new Thread(new Runnable() {  
+            int count = -1;  
+
+            @Override  
+            public void run() {  
+                while (true) {  
+                    list.add(count++ + &quot;&quot;);  
+                }  
+            }  
+        });  
+        t.setDaemon(true);  
+        t.start();  
+        Thread.currentThread().sleep(3);  
+        for (String s : list) {  
+            System.out.println(list.hashCode());  
+            System.out.println(s);  
+        }  
+    }  
+} 
+</code></pre>
+
+<p>这段代码在for循环中遍历list的时候，同时会输出list的hashcode来看看list是不是同一个list了</p>
+<p>部分输出结果如下：</p>
+<pre><code>669661746  
+a  
+2119153548  
+b  
+471684173  
+c  
+550648901  
+-1  
+-76447331  
+0  
+1638154873  
+1  
+921225916  
+2  
+1618672031  
+3  
+1404182932  
+4  
+950140076  
+5  
+-610377050  
+6  
+-610377050  
+7  
+-610377050  
+8  
+-610377050  
+9  
+-610377050  
+10  
+-610377050  
+11  
+-610377050  
+12 
+</code></pre>
+
+<p>从上面的结果很容易就看出来，hashcode变化了多次，说明了list已经不是原来的list对象了。这说明了CopyOnWriteArrayList类的add函数在执行的时候确实是修改了list的数组对象。</p>
+<p>看add函数的代码：</p>
+<pre><code>/** 
+     * Appends the specified element to the end of this list. 
+     * 
+     * @param e element to be appended to this list 
+     * @return &lt;tt&gt;true&lt;/tt&gt; (as specified by {@link Collection#add}) 
+     */  
+    public boolean add(E e) {  
+    final ReentrantLock lock = this.lock;  
+    lock.lock();  
+    try {  
+        Object[] elements = getArray();  
+        int len = elements.length;  
+        Object[] newElements = Arrays.copyOf(elements, len + 1);  
+        newElements[len] = e;  
+        setArray(newElements);  
+        return true;  
+    } finally {  
+        lock.unlock();  
+    }  
+    }  
+</code></pre>
+
+<p>add函数中拷贝了原来的数组并在最后加上了新元素。然后调用setArray函数将引用链接到新数组：</p>
+<pre><code>/** 
+    * Sets the array. 
+    */  
+   final void setArray(Object[] a) {  
+       array = a;  
+   } 
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../limiting/" class="btn btn-neutral" title="令牌桶"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../limiting/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>
