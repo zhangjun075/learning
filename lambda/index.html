@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>lambda - 张均的笔记</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "lambda";
+    var mkdocs_page_input_path = "lambda.md";
+    var mkdocs_page_url = "/lambda/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> 张均的笔记</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">index</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../microservice/">微服务</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../restfulapi/">restfulApi规范</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../designPattern/">设计模式</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../docker/">docker</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../limiting/">令牌桶</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../thread/">多线程</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">lambda</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#optinal">Optinal类</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../JSR310/">JSR310-日期</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../gc/">jvm及GC</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../trans/">db事务</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../springboot/">springboot</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">张均的笔记</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>lambda</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="optinal">Optinal类</h1>
+<p>新版本的Java，比如Java 8引入了一个新的Optional类。<a href="http://download.java.net/jdk8/docs/api/java/util/Optional.html">Optional</a>类的Javadoc描述如下：</p>
+<p><em>这是一个可以为null的容器对象。如果值存在则isPresent()方法会返回true，调用get()方法会返回该对象。</em></p>
+<p><strong>of</strong></p>
+<p>of方法通过工厂方法创建Optional类。需要注意的是，创建对象时传入的参数不能为null。如果传入参数为null，则抛出NullPointerException 。</p>
+<pre><code>//调用工厂方法创建Optional实例
+Optional&lt;String&gt; name = Optional.of(&quot;Sanaulla&quot;);
+//传入参数为null，抛出NullPointerException.
+Optional&lt;String&gt; someNull = Optional.of(null);
+</code></pre>
+
+<p><strong>ofNullable</strong></p>
+<p>ofNullable与of方法相似，唯一的区别是可以接受参数为null的情况。示例如下：</p>
+<pre><code>//下面创建了一个不包含任何值的Optional实例
+//例如，值为'null'
+Optional empty = Optional.ofNullable(null);
+</code></pre>
+
+<p><strong>isPresent</strong></p>
+<p>如果值存在返回true，否则返回false。</p>
+<pre><code>//isPresent方法用来检查Optional实例中是否包含值
+if (name.isPresent()) {
+  //在Optional实例内调用get()返回已存在的值
+  System.out.println(name.get());//输出Sanaulla
+}
+</code></pre>
+
+<p><strong>get</strong></p>
+<p>上面的示例中，get方法用来得到Optional实例中的值。下面我们看一个抛出NoSuchElementException的例子：</p>
+<pre><code>
+try {
+  //在空的Optional实例上调用get()，抛出NoSuchElementException
+  System.out.println(empty.get());
+} catch (NoSuchElementException ex) {
+  System.out.println(ex.getMessage());
+}
+</code></pre>
+
+<p><strong>ifPresent</strong></p>
+<p>要理解ifPresent方法，首先需要了解Consumer类。简答地说，<a href="http://blog.sanaulla.info/2013/04/01/predicate-and-consumer-interface-in-java-util-function-package-in-java-8/">Consumer</a>类包含一个抽象方法。该抽象方法对传入的值进行处理，但没有返回值。Java8支持不用接口直接通过lambda表达式传入参数。</p>
+<pre><code>//ifPresent方法接受lambda表达式作为参数。
+//lambda表达式对Optional的值调用consumer进行处理。
+name.ifPresent((value) -&gt; {
+  System.out.println(&quot;The length of the value is: &quot; + value.length());
+});
+</code></pre>
+
+<p><strong>orElse</strong></p>
+<p>如果Optional实例有值则将其返回，否则返回orElse方法传入的参数。示例如下：</p>
+<pre><code>//如果值不为null，orElse方法返回Optional实例的值。
+//如果为null，返回传入的消息。
+//输出：There is no value present!
+System.out.println(empty.orElse(&quot;There is no value present!&quot;));
+//输出：Sanaulla
+System.out.println(name.orElse(&quot;There is some value!&quot;));
+</code></pre>
+
+<p><strong>orElseGet</strong></p>
+<p>orElseGet与orElse方法类似，区别在于得到的默认值。orElse方法将传入的字符串作为默认值，orElseGet方法可以接受<a href="http://blog.sanaulla.info/2013/04/02/supplier-interface-in-java-util-function-package-in-java-8/">Supplier</a>接口的实现用来生成默认值。示例如下：</p>
+<pre><code>//orElseGet与orElse方法类似，区别在于orElse传入的是默认值，
+//orElseGet可以接受一个lambda表达式生成默认值。
+//输出：Default Value
+System.out.println(empty.orElseGet(() -&gt; &quot;Default Value&quot;));
+//输出：Sanaulla
+System.out.println(name.orElseGet(() -&gt; &quot;Default Value&quot;));
+</code></pre>
+
+<p><strong>orElseThrow</strong></p>
+<p>在orElseGet方法中，我们传入一个<a href="http://blog.sanaulla.info/2013/04/02/supplier-interface-in-java-util-function-package-in-java-8/">Supplier接口</a>。然而，在orElseThrow中我们可以传入一个lambda表达式或方法，如果值不存在来抛出异常。示例如下：</p>
+<pre><code>try {
+  //orElseThrow与orElse方法类似。与返回默认值不同，
+  //orElseThrow会抛出lambda表达式或方法生成的异常 
+
+  empty.orElseThrow(ValueAbsentException::new);
+} catch (Throwable ex) {
+  //输出: No value present in the Optional instance
+  System.out.println(ex.getMessage());
+}
+</code></pre>
+
+<p>ValueAbsentException定义如下：</p>
+<pre><code>class ValueAbsentException extends Throwable {
+
+  public ValueAbsentException() {
+    super();
+  }
+
+  public ValueAbsentException(String msg) {
+    super(msg);
+  }
+
+  @Override
+  public String getMessage() {
+    return &quot;No value present in the Optional instance&quot;;
+  }
+}
+</code></pre>
+
+<p><strong>map</strong></p>
+<p>如果有值，则对其执行调用mapping函数得到返回值。如果返回值不为null，则创建包含mapping返回值的Optional作为map方法返回值，否则返回空Optional。</p>
+<pre><code>//map方法执行传入的lambda表达式参数对Optional实例的值进行修改。
+//为lambda表达式的返回值创建新的Optional实例作为map方法的返回值。
+Optional&lt;String&gt; upperName = name.map((value) -&gt; value.toUpperCase());
+System.out.println(upperName.orElse(&quot;No value found&quot;));
+</code></pre>
+
+<p><strong>flatMap</strong></p>
+<p>如果有值，为其执行mapping函数返回Optional类型返回值，否则返回空Optional。flatMap与map（Funtion）方法类似，区别在于flatMap中的mapper返回值必须是Optional。调用结束时，flatMap不会对结果用Optional封装。</p>
+<pre><code>//flatMap与map（Function）非常类似，区别在于传入方法的lambda表达式的返回类型。
+//map方法中的lambda表达式返回值可以是任意类型，在map函数返回之前会包装为Optional。 
+//但flatMap方法中的lambda表达式返回值必须是Optionl实例。 
+upperName = name.flatMap((value) -&gt; Optional.of(value.toUpperCase()));
+System.out.println(upperName.orElse(&quot;No value found&quot;));//输出SANAULLA
+</code></pre>
+
+<p><strong>filter</strong></p>
+<p>filter个方法通过传入限定条件对Optional实例的值进行过滤。文档描述如下：
+如果有值并且满足断言条件返回包含该值的Optional，否则返回空Optional。</p>
+<p>读到这里，可能你已经知道如何为filter方法传入一段代码。是的，这里可以传入一个lambda表达式。对于filter函数我们应该传入实现了Predicate接口的lambda表达式。如果你不熟悉Predicate接口，可以参考<a href="http://blog.sanaulla.info/2013/04/01/predicate-and-consumer-interface-in-java-util-function-package-in-java-8/">这篇文章</a>。</p>
+<pre><code>//filter方法检查给定的Option值是否满足某些条件。
+//如果满足则返回同一个Option实例，否则返回空Optional。
+Optional&lt;String&gt; longName = name.filter((value) -&gt; value.length() &gt; 6);
+System.out.println(longName.orElse(&quot;The name is less than 6 characters&quot;));//输出Sanaulla
+
+//另一个例子是Optional值不满足filter指定的条件。
+Optional&lt;String&gt; anotherName = Optional.of(&quot;Sana&quot;);
+Optional&lt;String&gt; shortName = anotherName.filter((value) -&gt; value.length() &gt; 6);
+//输出：name长度不足6字符
+System.out.println(shortName.orElse(&quot;The name is less than 6 characters&quot;));
+</code></pre>
+
+<p><strong>完整示例</strong></p>
+<pre><code>public class OptionalDemo {
+
+  public static void main(String[] args) {
+    //创建Optional实例，也可以通过方法返回值得到。
+    Optional&lt;String&gt; name = Optional.of(&quot;Sanaulla&quot;);
+
+    //创建没有值的Optional实例，例如值为'null'
+    Optional empty = Optional.ofNullable(null);
+
+    //isPresent方法用来检查Optional实例是否有值。
+    if (name.isPresent()) {
+      //调用get()返回Optional值。
+      System.out.println(name.get());
+    }
+
+    try {
+      //在Optional实例上调用get()抛出NoSuchElementException。
+      System.out.println(empty.get());
+    } catch (NoSuchElementException ex) {
+      System.out.println(ex.getMessage());
+    }
+
+    //ifPresent方法接受lambda表达式参数。
+    //如果Optional值不为空，lambda表达式会处理并在其上执行操作。
+    name.ifPresent((value) -&gt; {
+      System.out.println(&quot;The length of the value is: &quot; + value.length());
+    });
+
+    //如果有值orElse方法会返回Optional实例，否则返回传入的错误信息。
+    System.out.println(empty.orElse(&quot;There is no value present!&quot;));
+    System.out.println(name.orElse(&quot;There is some value!&quot;));
+
+    //orElseGet与orElse类似，区别在于传入的默认值。
+    //orElseGet接受lambda表达式生成默认值。
+    System.out.println(empty.orElseGet(() -&gt; &quot;Default Value&quot;));
+    System.out.println(name.orElseGet(() -&gt; &quot;Default Value&quot;));
+
+    try {
+      //orElseThrow与orElse方法类似，区别在于返回值。
+      //orElseThrow抛出由传入的lambda表达式/方法生成异常。
+      empty.orElseThrow(ValueAbsentException::new);
+    } catch (Throwable ex) {
+      System.out.println(ex.getMessage());
+    }
+
+    //map方法通过传入的lambda表达式修改Optonal实例默认值。 
+    //lambda表达式返回值会包装为Optional实例。
+    Optional&lt;String&gt; upperName = name.map((value) -&gt; value.toUpperCase());
+    System.out.println(upperName.orElse(&quot;No value found&quot;));
+
+    //flatMap与map（Funtion）非常相似，区别在于lambda表达式的返回值。
+    //map方法的lambda表达式返回值可以是任何类型，但是返回值会包装成Optional实例。
+    //但是flatMap方法的lambda返回值总是Optional类型。
+    upperName = name.flatMap((value) -&gt; Optional.of(value.toUpperCase()));
+    System.out.println(upperName.orElse(&quot;No value found&quot;));
+
+    //filter方法检查Optiona值是否满足给定条件。
+    //如果满足返回Optional实例值，否则返回空Optional。
+    Optional&lt;String&gt; longName = name.filter((value) -&gt; value.length() &gt; 6);
+    System.out.println(longName.orElse(&quot;The name is less than 6 characters&quot;));
+
+    //另一个示例，Optional值不满足给定条件。
+    Optional&lt;String&gt; anotherName = Optional.of(&quot;Sana&quot;);
+    Optional&lt;String&gt; shortName = anotherName.filter((value) -&gt; value.length() &gt; 6);
+    System.out.println(shortName.orElse(&quot;The name is less than 6 characters&quot;));
+
+  }
+
+}
+</code></pre>
+
+<p><strong>相关文章</strong></p>
+<ul>
+<li><a href="http://www.importnew.com/22667.html">Java 8 的 Nashorn 脚本引擎教程</a></li>
+<li><a href="http://www.importnew.com/19345.html">Java 8 特性 – 终极手册</a></li>
+<li><a href="http://www.importnew.com/17313.html">ava 8 Streams API：对Stream分组和分区</a></li>
+<li><a href="http://www.importnew.com/17209.html">Java 8：使用compose和andThen组合函数</a></li>
+<li><a href="http://www.importnew.com/17262.html">Java8 Lambda表达式和流操作如何让你的代码变慢5倍</a></li>
+<li><a href="http://www.importnew.com/16801.html">Java 8并行流：必备技巧</a></li>
+<li><a href="http://www.importnew.com/16789.html">用Java 8 Lambda表达式实现设计模式：命令模式</a></li>
+<li><a href="http://www.importnew.com/15259.html">Java8：Lambda表达式增强版Comparator和排序</a></li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../JSR310/" class="btn btn-neutral float-right" title="JSR310-日期">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../thread/" class="btn btn-neutral" title="多线程"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../thread/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../JSR310/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

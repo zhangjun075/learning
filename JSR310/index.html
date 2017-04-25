@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>JSR310-日期 - 张均的笔记</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "JSR310-\u65e5\u671f";
+    var mkdocs_page_input_path = "JSR310.md";
+    var mkdocs_page_url = "/JSR310/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> 张均的笔记</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">index</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../microservice/">微服务</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../restfulapi/">restfulApi规范</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../designPattern/">设计模式</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../docker/">docker</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../limiting/">令牌桶</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../thread/">多线程</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../lambda/">lambda</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">JSR310-日期</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#apijsr310">日期时间API（JSR310）</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../gc/">jvm及GC</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../trans/">db事务</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../springboot/">springboot</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">张均的笔记</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>JSR310-日期</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="apijsr310">日期时间API（JSR310）</h1>
+<p>Java 8引入了新的日期时间API（JSR 310）改进了日期时间的管理。日期和时间管理一直是Java开发人员最痛苦的问题。java.util.Date和后来的java.util.Calendar一点也没有改变这个情况（甚至让人们更加迷茫）。</p>
+<p>因为上面这些原因，产生了<a href="http://www.joda.org/joda-time/">Joda-Time</a> ，可以替换Java的日期时间API。Joda-Time深刻影响了 Java 8新的日期时间API，Java 8吸收了Joda-Time 的精华。新的java.time包包含了所有关于日期、时间、日期时间、时区、Instant（跟日期类似但精确到纳秒）、duration（持续时间）和时钟操作的类。设计这些API的时候很认真地考虑了这些类的不变性（从java.util.Calendar吸取的痛苦教训）。如果需要修改时间对象，会返回一个新的实例。</p>
+<p>让我们看看一些关键的类和用法示例。第一个类是Clock，Clock使用时区来访问当前的instant, date和time。Clock类可以替换 System.currentTimeMillis() 和 TimeZone.getDefault().</p>
+<pre><code>// Get the system clock as UTC offset
+final Clock clock = Clock.systemUTC();
+System.out.println( clock.instant() );
+System.out.println( clock.millis() );
+</code></pre>
+
+<pre><code>控制台输出如下：
+2014-04-12T15:19:29.282Z
+1397315969360
+</code></pre>
+
+<p>其他类我们看看LocalTime和LocalDate。LocalDate只保存有ISO-8601日期系统的日期部分，有时区信息，相应地，LocalTime只保存ISO-8601日期系统的时间部分，没有时区信息。LocalDate和LocalTime都可以从Clock对象创建。</p>
+<pre><code>// Get the local date and local time
+final LocalDate date = LocalDate.now();
+final LocalDate dateFromClock = LocalDate.now( clock );
+
+System.out.println( date );
+System.out.println( dateFromClock );
+
+// Get the local date and local time
+final LocalTime time = LocalTime.now();
+final LocalTime timeFromClock = LocalTime.now( clock );
+
+System.out.println( time );
+System.out.println( timeFromClock );
+</code></pre>
+
+<pre><code>控制台输出如下：
+2014-04-12
+2014-04-12
+11:25:54.568
+15:25:54.568
+</code></pre>
+
+<p>LocalDateTime类合并了LocalDate和LocalTime，它保存有ISO-8601日期系统的日期和时间，但是没有时区信息。让我们看一个简单的例子。</p>
+<pre><code>// Get the local date/time
+final LocalDateTime datetime = LocalDateTime.now();
+final LocalDateTime datetimeFromClock = LocalDateTime.now( clock );
+
+System.out.println( datetime );
+System.out.println( datetimeFromClock );
+</code></pre>
+
+<pre><code>输出如下：
+
+2014-04-12T11:37:52.309
+2014-04-12T15:37:52.309
+</code></pre>
+
+<p>如果您需要一个类持有日期时间和时区信息，可以使用ZonedDateTime，它保存有ISO-8601日期系统的日期和时间，而且有时区信息。让我们看一些例子：</p>
+<pre><code>// Get the zoned date/time
+final ZonedDateTime zonedDatetime = ZonedDateTime.now();
+final ZonedDateTime zonedDatetimeFromClock = ZonedDateTime.now( clock );
+final ZonedDateTime zonedDatetimeFromZone = ZonedDateTime.now( ZoneId.of( &quot;America/Los_Angeles&quot; ) );
+
+System.out.println( zonedDatetime );
+System.out.println( zonedDatetimeFromClock );
+System.out.println( zonedDatetimeFromZone );
+</code></pre>
+
+<pre><code>输出如下：
+2014-04-12T11:47:01.017-04:00[America/New_York]
+2014-04-12T15:47:01.017Z
+2014-04-12T08:47:01.017-07:00[America/Los_Angeles]
+</code></pre>
+
+<p>最后让我们看看Duration类，Duration持有的时间精确到纳秒。它让我们很容易计算两个日期中间的差异。让我们来看一下：</p>
+<pre><code>// Get duration between two dates
+final LocalDateTime from = LocalDateTime.of( 2014, Month.APRIL, 16, 0, 0, 0 );
+final LocalDateTime to = LocalDateTime.of( 2015, Month.APRIL, 16, 23, 59, 59 );
+
+final Duration duration = Duration.between( from, to );
+System.out.println( &quot;Duration in days: &quot; + duration.toDays() );
+System.out.println( &quot;Duration in hours: &quot; + duration.toHours() );
+</code></pre>
+
+<p>上面的例子计算了两个日期（2014年4月16日和2014年5月16日）之间的持续时间（基于天数和小时）输出如下：</p>
+<pre><code>Duration in days: 365
+Duration in hours: 8783
+</code></pre>
+
+<p>对于Java 8的新日期时间的总体印象还是比较积极的。一部分是因为有经历实战的Joda-Time的基础，还有一部分是因为日期时间终于被认真对待而且听取了开发人员的声音。关于更多的详细信息，请参考<a href="http://docs.oracle.com/javase/tutorial/datetime/index.html">官方文档</a>。</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../gc/" class="btn btn-neutral float-right" title="jvm及GC">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../lambda/" class="btn btn-neutral" title="lambda"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../lambda/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../gc/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>
