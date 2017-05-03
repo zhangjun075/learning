@@ -8,7 +8,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>设计模式 - 张均的笔记</title>
+  <title>springboot - 张均的笔记</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
@@ -17,9 +17,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "\u8bbe\u8ba1\u6a21\u5f0f";
-    var mkdocs_page_input_path = "designPattern.md";
-    var mkdocs_page_url = "/designPattern/";
+    var mkdocs_page_name = "springboot";
+    var mkdocs_page_input_path = "springboot.md";
+    var mkdocs_page_url = "/springboot/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js"></script>
@@ -68,15 +68,8 @@
 <li>
           
             <li>
-    <li class="toctree-l1 current">
-        <a class="current" href="./">设计模式</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#observer-pattern">observer pattern</a></li>
-                
-            
-            </ul>
+    <li class="toctree-l1 ">
+        <a class="" href="../designPattern/">设计模式</a>
         
     </li>
 <li>
@@ -131,8 +124,15 @@
 <li>
           
             <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../springboot/">springboot</a>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">springboot</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#springboot">Springboot 优雅停机</a></li>
+                
+            
+            </ul>
         
     </li>
 <li>
@@ -159,7 +159,7 @@
     
       
     
-    <li>设计模式</li>
+    <li>springboot</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -169,53 +169,62 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="observer-pattern">observer pattern</h1>
-<p><img alt="" src="../images/observer.png" />
-* 被观察者</p>
-<pre><code>public class DemoObservable extends Observable {
-    private String param;
-
-    public String getParam(){
-        return this.param;
-    }
-
-    public void setParam(String param){
-        this.param = param;
-        setChanged();
-        notifyObservers();
-    }
-}
-</code></pre>
-
-<p>在状态变化的时候，需要改变状态通知，然后通知观察者。
-* 观察者</p>
-<pre><code>public class DemoObserver implements Observer {
-    @Override
-    public void update(Observable o, Object arg) {
-        DemoObservable demoObservable = (DemoObservable) o;
-        System.out.println(&quot;观察者模式，接收到改变信息：&quot;+((DemoObservable) o).getParam());
-    }
-}
-</code></pre>
-
-<p>观察者需要实现update方法。一般做法需要关注下update方法实现后，是否需要把状态改回来，即setChanged(false);</p>
+                <h1 id="springboot">Springboot 优雅停机</h1>
+<p>如何优雅地停止运行中的内嵌Tomcat的Spring Boot应用</p>
+<p>你很可能根据https://spring.io/guides/gs/rest-service/搭起了一个Spring的Rest服务，然后打包成了jar包，不需要容器就可以在生成环境下通过运行jar包启动一个Web服务。</p>
+<p>但这样的服务怎么样正确的停止呢？或许你只是简单的kill -9对应的进程，但实际上，有更优雅的方式。</p>
+<p>Spring Boot里面有一个spring-boot-starter-actuator的项目，可以监控和管理Spring Boot应用。其中暴露了很多endpoint,可以方便的检测应用的健康情况。其中有一个shutdown的endpoint可以优雅地停止应用。</p>
 <ul>
-<li>测试类</li>
+<li>Maven基本配置</li>
 </ul>
-<pre><code>public class TestDemo {
-    public static void main(String[] args){
-        DemoObservable demoObservable = new DemoObservable();
-        DemoObserver demoObserver = new DemoObserver();
-        demoObservable.addObserver(demoObserver);
-        demoObservable.setParam(&quot;123123&quot;);
-    }
-}
+<p><strong>增加依赖</strong></p>
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+&lt;/dependency&gt;
 </code></pre>
 
-<ul>
-<li>测试结果</li>
-</ul>
-<pre><code>观察者模式，接收到改变信息：123123
+<p><strong>配置文件配置启用shutdown的HTTP访</strong></p>
+<pre><code>#启用 shutdown endpoint的HTTP访问
+endpoints.shutdown.enabled=true
+#不需要用户名密码验证 
+endpoints.shutdown.sensitive=false
+</code></pre>
+
+<p><strong>POST请求到shutdown路径</strong></p>
+<p>以上配置完成后，可以使用curl -X POST localhost:port/shutdown发动post请求，即可优雅的停止应用：</p>
+<pre><code>curl -X POST localhost:8088/manage/shutdown      
+{&quot;message&quot;:&quot;Shutting down, bye...&quot;}
+</code></pre>
+
+<p><strong>密码安全配置</strong></p>
+<p>若需要安全验证，则需要以下依赖：</p>
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>并配置你想要密码验证的endpoint的sensitive=true.</p>
+<pre><code>endpoints.shutdown.sensitive=true
+</code></pre>
+
+<p>在application.properties文件配置对应的密码：</p>
+<pre><code>security.user.name=admin
+security.user.password=secret
+management.security.role=SUPERUSER
+</code></pre>
+
+<p><strong>路径/端口/ip访问限制</strong></p>
+<p>很可能这种监控你只需要在本机访问（如只有本机才能关闭应用），若需要如此，可以考虑以下管理配置</p>
+<pre><code>##management endpoint的路径，默认为/
+management.context-path=/manage
+
+##management endpoint的监听端口
+management.port=8081
+
+##management endpoint只允许来自本机的连接
+management.address=127.0.0.1
 </code></pre>
               
             </div>
@@ -224,10 +233,8 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../docker/" class="btn btn-neutral float-right" title="docker">Next <span class="icon icon-circle-arrow-right"></span></a>
       
-      
-        <a href="../restfulapi/" class="btn btn-neutral" title="restfulApi规范"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../trans/" class="btn btn-neutral" title="db事务"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -253,10 +260,8 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../restfulapi/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../trans/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
-      
-        <span style="margin-left: 15px"><a href="../docker/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

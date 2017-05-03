@@ -199,6 +199,26 @@ spring:
           force-pull: true
 ```
 
+* 踩坑实录
+
+```
+<dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>Brixton.RELEASE</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+```
+
+但是config-server用的是1.3的版本，导致在验证的时候/health等报500内部错误。
+
+**注意：springcloud 的版本一定要保持一致**
+
 
 ### configClient
 * 请参照http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html#_spring_cloud_config_client
