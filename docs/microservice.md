@@ -380,6 +380,78 @@ A central concept in Ribbon is that of the named client. Each load balancer is p
         + hystrix.threadpool.default.maxQueueSize=-1：默认-1，使用SynchronousQueue。其他正数则使用LinkedBlockingQueue。队列大小在初始化时候生效，如果要动态改变队列大小参考queueSizeRejectionThreshold参数。如果要在SynchronousQueue 和LinkedBlockingQueue之间切换需要重新启动，以为着改变了队列大小并不改变当前的队列实现。
 ![](images/parralel.png)
 * 如果采用semaphore的方式，那么是同步的方式，thread.timeout不起作用。
+
+* hystrix-sample:代码结构
+![](images/hystrix-sample.png)
+
+* hystrix-sample:pom.xml文件
+```
+  <dependency>
+      <groupId>com.netflix.hystrix</groupId>
+      <artifactId>hystrix-core</artifactId>
+      <version>RELEASE</version>
+    </dependency>
+```
+
+* hystrix-sample:代码说明
+      
+编写command类
+```
+/**
+ * Created by junzhang on 2017/5/9.
+ */
+public class HelloCommand extends HystrixCommand {
+    private String name;
+    public HelloCommand() {
+        super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("HelloGroup"))
+        .andCommandKey(HystrixCommandKey.Factory.asKey("Hello1Command"))
+        .andThreadPoolKey(HystrixThreadPoolKey.Factory.asKey("Hello1CommandPool"))
+        .andCommandPropertiesDefaults(
+                HystrixCommandProperties.Setter()
+                        .withExecutionTimeoutEnabled(true)
+                        .withExecutionTimeoutInMilliseconds(2000)
+                        .withExecutionIsolationStrategy(HystrixCommandProperties.ExecutionIsolationStrategy.THREAD)
+//                        .withExecutionIsolationThreadInterruptOnTimeout(true)
+//                        .withExecutionIsolationThreadInterruptOnFutureCancel(true)
+        )
+        .andThreadPoolPropertiesDefaults(
+                HystrixThreadPoolProperties
+                .Setter()
+                .withCoreSize(10)
+                .withQueueSizeRejectionThreshold(20)
+        ));
+        this.name = name;
+    }
+
+    @Override
+    protected String run() throws Exception {
+        TimeUnit.SECONDS.sleep(3);
+        System.out.println("run method");
+//        throw new Exception("my exception");
+        return "hello world!";
+    }
+
+    @Override
+    protected String getFallback() {
+        System.out.println("hello world fallback method.");
+        return "hello world fallback method.";
+    }
+}
+```
+
+* hystrix-sample:调用
+```
+@Service
+public class HelloCommandService {
+
+        HelloCommand helloCommand = new HelloCommand();
+      return  helloCommand.execute().toString();
+    }
+}
+```
+
+* 这里有几种调用方式：future、或者用observer。execute和future最终都是通过observer来处理的。具体可以参见[源码](https://github.com/Netflix/Hystrix/wiki/How-To-Use#CommandGroup)
+
 ## zuul
 ** Router and Filter **
 ```

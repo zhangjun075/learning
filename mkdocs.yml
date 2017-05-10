@@ -1,15 +1,21 @@
 site_name: 张均的笔记
 pages:
     - index : index.md
-    - 微服务 : microservice.md
-    - restfulApi规范 : restfulapi.md
+    - 微服务 :
+        - netflix : microservice.md
+        - restfulApi规范 : restfulapi.md
     - 设计模式 : designPattern.md
     - docker : docker.md
-    - 令牌桶 : limiting.md
-    - 多线程 : thread.md
-    - lambda : lambda.md
-    - JSR310-日期 : JSR310.md
-    - jvm及GC : gc.md
-    - db事务 : trans.md
-    - springboot : springboot.md
-theme: readthedocs
+    - java :
+        - 多线程 : thread.md
+        - lambda : lambda.md
+        - JSR310-日期 : JSR310.md
+        - jvm及GC : gc.md
+        - swagger : swagger.md
+        - 令牌桶 : limiting.md
+    - 数据库 :
+        - db事务 : trans.md
+        - 连接池 : dbpool.md
+    - spring :
+        - springboot : springboot.md
+#theme: readthedocs

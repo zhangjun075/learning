@@ -103,6 +103,8 @@ Not Support：当前方法不支持事务，如果当前线程存在事务，就
 
 Never：当前方法不支持事务，如果当前线程存在事务，则抛出异常。这种用的比较少。
 
+**PSCache内存占用优化对于支持游标的数据库（Oracle、SQL Server、DB2等，不包括MySql）:druid**
+
 
 
 
