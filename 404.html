@@ -7,21 +7,21 @@
         
         
         
-        <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>设计模式 - 张均的笔记</title>
-        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
-        <link href="../css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="../css/highlight.css">
+        <link rel="shortcut icon" href="/img/favicon.ico">
+        <title>张均的笔记</title>
+        <link href="/css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="/css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="/css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="/css/highlight.css">
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
 	
-	<script src="../js/jquery-1.10.2.min.js"></script>
-        <script src="../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../js/highlight.pack.js"></script> 
+	<script src="/js/jquery-1.10.2.min.js"></script>
+        <script src="/js/bootstrap-3.0.3.min.js"></script>
+        <script src="/js/highlight.pack.js"></script> 
     </head>
 
     <body>
@@ -38,7 +38,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="..">张均的笔记</a>
+            <a class="navbar-brand" href="">张均的笔记</a>
         </div>
 
         <!-- Expanded navigation -->
@@ -46,53 +46,53 @@
                 <!-- Main navigation -->
                 <ul class="nav navbar-nav">
                     <li >
-                        <a href="..">index</a>
+                        <a href="">index</a>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">微服务 <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
 <li >
-    <a href="../microservice/">netflix</a>
+    <a href="/microservice">netflix</a>
 </li>
                             
 <li >
-    <a href="../restfulapi/">restfulApi规范</a>
+    <a href="/restfulapi">restfulApi规范</a>
 </li>
                         </ul>
                     </li>
-                    <li class="active">
-                        <a href="./">设计模式</a>
+                    <li >
+                        <a href="/designPattern">设计模式</a>
                     </li>
                     <li >
-                        <a href="../docker/">docker</a>
+                        <a href="/docker">docker</a>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">java <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
 <li >
-    <a href="../thread/">多线程</a>
+    <a href="/thread">多线程</a>
 </li>
                             
 <li >
-    <a href="../lambda/">lambda</a>
+    <a href="/lambda">lambda</a>
 </li>
                             
 <li >
-    <a href="../JSR310/">JSR310-日期</a>
+    <a href="/JSR310">JSR310-日期</a>
 </li>
                             
 <li >
-    <a href="../gc/">jvm及GC</a>
+    <a href="/gc">jvm及GC</a>
 </li>
                             
 <li >
-    <a href="../swagger/">swagger</a>
+    <a href="/swagger">swagger</a>
 </li>
                             
 <li >
-    <a href="../limiting/">令牌桶</a>
+    <a href="/limiting">令牌桶</a>
 </li>
                         </ul>
                     </li>
@@ -101,11 +101,11 @@
                         <ul class="dropdown-menu">
                             
 <li >
-    <a href="../trans/">db事务</a>
+    <a href="/trans">db事务</a>
 </li>
                             
 <li >
-    <a href="../dbpool/">连接池</a>
+    <a href="/dbpool">连接池</a>
 </li>
                         </ul>
                     </li>
@@ -114,7 +114,7 @@
                         <ul class="dropdown-menu">
                             
 <li >
-    <a href="../springboot/">springboot</a>
+    <a href="/springboot">springboot</a>
 </li>
                         </ul>
                     </li>
@@ -126,86 +126,30 @@
                         <i class="fa fa-search"></i> Search
                     </a>
                 </li>
-                    <li >
-                        <a rel="next" href="../restfulapi/">
-                            <i class="fa fa-arrow-left"></i> Previous
-                        </a>
-                    </li>
-                    <li >
-                        <a rel="prev" href="../docker/">
-                            Next <i class="fa fa-arrow-right"></i>
-                        </a>
-                    </li>
             </ul>
         </div>
     </div>
 </div>
 
         <div class="container">
-                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#observer-pattern">observer pattern</a></li>
-    </ul>
-</div></div>
-                <div class="col-md-9" role="main">
 
-<h1 id="observer-pattern">observer pattern</h1>
-<p><img alt="" src="../images/observer.png" />
-* 被观察者</p>
-<pre><code>public class DemoObservable extends Observable {
-    private String param;
+    <div class="row-fluid">
+      <div id="main-content" class="span12">
+        <h1 id="404-page-not-found" style="text-align: center">404</h1>
+        <p style="text-align: center"><strong>Page not found</strong></p>
+      </div>
+    </div>
 
-    public String getParam(){
-        return this.param;
-    }
 
-    public void setParam(String param){
-        this.param = param;
-        setChanged();
-        notifyObservers();
-    }
-}
-</code></pre>
-
-<p>在状态变化的时候，需要改变状态通知，然后通知观察者。
-* 观察者</p>
-<pre><code>public class DemoObserver implements Observer {
-    @Override
-    public void update(Observable o, Object arg) {
-        DemoObservable demoObservable = (DemoObservable) o;
-        System.out.println(&quot;观察者模式，接收到改变信息：&quot;+((DemoObservable) o).getParam());
-    }
-}
-</code></pre>
-
-<p>观察者需要实现update方法。一般做法需要关注下update方法实现后，是否需要把状态改回来，即setChanged(false);</p>
-<ul>
-<li>测试类</li>
-</ul>
-<pre><code>public class TestDemo {
-    public static void main(String[] args){
-        DemoObservable demoObservable = new DemoObservable();
-        DemoObserver demoObserver = new DemoObserver();
-        demoObservable.addObserver(demoObserver);
-        demoObservable.setParam(&quot;123123&quot;);
-    }
-}
-</code></pre>
-
-<ul>
-<li>测试结果</li>
-</ul>
-<pre><code>观察者模式，接收到改变信息：123123
-</code></pre></div>
         </div>
 
         <footer class="col-md-12">
             <hr>
             <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
-        <script>var base_url = '..';</script>
-        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
-        <script src="../js/base.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+        <script>var base_url = '';</script>
+        <script data-main="/mkdocs/js/search.js" src="/mkdocs/js/require.js"></script>
+        <script src="/js/base.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
