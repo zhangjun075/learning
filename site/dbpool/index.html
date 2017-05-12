@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>restfulApi规范 - 张均的笔记</title>
+        <title>连接池 - 张均的笔记</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -48,7 +48,7 @@
                     <li >
                         <a href="..">index</a>
                     </li>
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">微服务 <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
@@ -56,8 +56,8 @@
     <a href="../microservice/">netflix</a>
 </li>
                             
-<li class="active">
-    <a href="./">restfulApi规范</a>
+<li >
+    <a href="../restfulapi/">restfulApi规范</a>
 </li>
                         </ul>
                     </li>
@@ -96,7 +96,7 @@
 </li>
                         </ul>
                     </li>
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">数据库 <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
@@ -104,8 +104,8 @@
     <a href="../trans/">db事务</a>
 </li>
                             
-<li >
-    <a href="../dbpool/">连接池</a>
+<li class="active">
+    <a href="./">连接池</a>
 </li>
                         </ul>
                     </li>
@@ -127,12 +127,12 @@
                     </a>
                 </li>
                     <li >
-                        <a rel="next" href="../microservice/">
+                        <a rel="next" href="../trans/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../designPattern/">
+                        <a rel="prev" href="../springboot/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -144,158 +144,39 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#restful-api">Restful API 的设计规范</a></li>
-            <li><a href="#1uri">1.uri</a></li>
-            <li><a href="#2-request">2. Request</a></li>
-            <li><a href="#_4">待续。。。。。。。</a></li>
+        <li class="main active"><a href="#_1">连接池配置</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="restful-api">Restful API 的设计规范</h1>
-<p>http://novoland.github.io/%E8%AE%BE%E8%AE%A1/2015/08/17/Restful%20API%20%E7%9A%84%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83.html</p>
-<h2 id="1uri">1.uri</h2>
-<ul>
-<li>URI 表示资源，资源一般对应服务器端领域模型中的实体类。</li>
-</ul>
-<h3 id="_1">规范</h3>
-<ul>
-<li>不用大写；</li>
-<li>用中杠-不用下杠_；</li>
-<li>参数列表要encode；</li>
-<li>URI中的名词表示资源集合，使用复数形式。\</li>
-</ul>
-<h3 id="vs">资源集合 vs 单个资源</h3>
-<p>URI表示资源的两种方式：资源集合、单个资源。</p>
-<ul>
-<li>资源集合：</li>
-</ul>
-<pre><code>/zoos //所有动物园
-/zoos/1/animals //id为1的动物园中的所有动物
+<h1 id="_1">连接池配置</h1>
+<p>正确配置DBCP防止数据库重启引起的访问错误</p>
+<p>在java web 应用中使用dbcp做为连接池，当数据库重启或数据库连接超过设置的最大timemout时间，数据库会强行断开已有的链接，此时当web程序访问数据库时就会出现错误，大致的错误信息java.io.EOFException: Can not read response from server. Expected to read 4 bytes, read 0 bytes before connection was unexpectedly lost，原因是数据库这边已有的连接强行断开，而连接池中不知道已经断开，还是从连接池取出数据库连接交给程序去执行数据库操作，所以导致出错。</p>
+<p>mysql的默认最大timeout时间是8小时，对空闲超过8小时的数据库连接会强行断开。timeout有两种，一个是非交互式的最大等待时间wait_timeout，另一个是交互式的最大等待时间interactive_time，交互连接如mysql gui tool中的连接。一般情况下interactive_timeout的设置将要对你的web 应用没有多大的影响。wait_timeout的时间设置太小话会导致连接关闭很快，从而使一些持久连接不起作用，反之设置过大，容易造成连接打开时间过长，在show processlist时，能看到太多的sleep状态的连接，从而造成too many connections错误。修改wait_timeout可以在my.cnf的mysqld段中设置。</p>
+<p>可以通过dbcp的配置来解决上述的报错。可以用两种方式。</p>
+<p>方式一：通过设置validationQuery，例如:</p>
+<pre><code>&lt;property name="validationQuery"&gt;
+    &lt;value&gt;select 1&lt;/value&gt;
+&lt;/property&gt;
 </code></pre>
-
-<ul>
-<li>单个资源：</li>
-</ul>
-<pre><code>/zoos/1 //id为1的动物园
-/zoos/1;2;3 //id为1，2，3的动物园
+<p>使用上述配置，连接池在返回数据库连接给申请者时会多执行一条sql语句来确保该连接的有效性。如果数据库方已经关闭了，连接池会重新建立连接并返回给申请者。通过测试似乎跟testWhileIdle没有关系，不管其是true或false都正常工作。</p>
+<p>方式二：通过配置timeBetweenEvictionRunsMillis和minEvictableIdleTimeMillis，例如：</p>
+<pre><code>&lt;property name="minEvictableIdleTimeMillis"&gt;
+    &lt;value&gt;60000&lt;/value&gt;
+&lt;/property&gt;
+&lt;property name="timeBetweenEvictionRunsMillis"&gt;
+    &lt;value&gt;10000&lt;/value&gt;
+&lt;/property&gt;
 </code></pre>
-
-<h3 id="uri">避免层级过深的URI</h3>
-<p>/在url中表达层级，用于按实体关联关系进行对象导航，一般根据id导航。</p>
-<p>过深的导航容易导致url膨胀，不易维护，如 GET /zoos/1/areas/3/animals/4，尽量使用查询参数代替路径中的实体导航，如GET /animals?zoo=1&amp;area=3；</p>
-<h3 id="composite">对Composite资源的访问</h3>
-<p>服务器端的组合实体必须在uri中通过父实体的id导航访问。</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>组合实体不是first-class的实体，它的生命周期完全依赖父实体，无法独立存在，在实现上通常是对数据库表中某些列的抽象，不直接对应表，也无id。一个常见的例子是 User — Address，Address是对User表中zipCode/country/city三个字段的简单抽象，无法独立于User存在。必须通过User索引到Address：GET /user/1/addresses</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<h2 id="2-request">2. Request</h2>
-<h3 id="http">HTTP方法</h3>
-<ul>
-<li>通过标准HTTP方法对资源CRUD</li>
-<li>GET：查询</li>
-</ul>
-<pre><code> GET /zoos
- GET /zoos/1
- GET /zoos/1/employees
-</code></pre>
-
-<ul>
-<li>POST：创建单个资源。POST一般向“资源集合”型uri发起</li>
-</ul>
-<pre><code>POST /animals  //新增动物
-POST /zoos/1/employees //为id为1的动物园雇佣员工
-</code></pre>
-
-<ul>
-<li>PUT：更新单个资源（全量），客户端提供完整的更新后的资源。与之对应的是 PATCH，PATCH 负责部分更新，客户端提供要更新的那些字段。PUT/PATCH一般向“单个资源”型uri发起</li>
-</ul>
-<pre><code>PUT /animals/1
-PUT /zoos/1
-</code></pre>
-
-<ul>
-<li>DELETE：删除</li>
-</ul>
-<pre><code>DELETE /zoos/1/employees/2
-DELETE /zoos/1/employees/2;4;5
-DELETE /zoos/1/animals  //删除id为1的动物园内的所有动物
-</code></pre>
-
-<h3 id="_2">安全性和幂等性</h3>
-<ul>
-<li>安全性：不会改变资源状态，可以理解为只读的；</li>
-<li>幂等性：执行1次和执行N次，对资源状态改变的效果是等价的。</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>安全性</th>
-<th>幂等性</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>GET</td>
-<td>√</td>
-<td>√</td>
-</tr>
-<tr>
-<td>POST</td>
-<td>×</td>
-<td>×</td>
-</tr>
-<tr>
-<td>PUT</td>
-<td>×</td>
-<td>√</td>
-</tr>
-<tr>
-<td>DELETE</td>
-<td>×</td>
-<td>√</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>安全性和幂等性均不保证反复请求能拿到相同的response。以 DELETE 为例，第一次DELETE返回200表示删除成功，第二次返回404提示资源不存在，这是允许的。</li>
-</ul>
-<h3 id="_3">复杂查询</h3>
-<ul>
-<li>查询可以捎带以下参数：</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>.</th>
-<th>示例</th>
-<th>备注</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>过滤条件</td>
-<td>?type=1&amp;age=16</td>
-<td>允许一定的uri冗余，如/zoos/1与/zoos?id=1</td>
-</tr>
-<tr>
-<td>排序</td>
-<td>?sort=age,desc</td>
-<td></td>
-</tr>
-<tr>
-<td>分页</td>
-<td>?limit=10&amp;offset=3</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h2 id="_4">待续。。。。。。。</h2></div>
+<p>在构造GenericObjectPool [BasicDataSource在其createDataSource () 方法中也会使用GenericObjectPool]时，会生成一个内嵌类Evictor，实现自Runnable接口。如果timeBetweenEvictionRunsMillis大于0，每过 timeBetweenEvictionRunsMillis毫秒Evictor会调用evict()方法，检查连接池中的连接的闲置时间是否大于 minEvictableIdleTimeMillis毫秒（_minEvictableIdleTimeMillis小于等于0时则忽略，默认为30分钟），是则销毁此对象，然后调用ensureMinIdle方法检查确保池中对象个数不小于_minIdle。如果连接池的连接数小于最小空闲连接数，则创建数据库连接，同时检查连接池的连接是否小于maxIdle，是则把刚创建的连接放入连接池中，否则销毁此对象。</p>
+<p>上述方式一能确保不出现本文开头提到的错误，但是不好的方面是每次执行sql时都会额外执行一条提供的validationQuery sql；第二种方式在数据库重启后minEvictableIdleTimeMillis毫秒前访问web应用，连接数据库使用的还是连接池中老的连接，所以还会出现上述的错误，timeBetweenEvictionRunsMillis和minEvictableIdleTimeMillis也不宜设置过小，会加重系统开销。根据具体情况来考虑使用哪种方式。对于数据库可能会经常重启，web应用和数据库机器的网络连接不稳定，可以采取第一种方式，否则使用第二种。由于mysql的默认最大空闲时间8小时，所以只要把minEvictableIdleTimeMillis设置小于此值即可。例如配置每十分钟检查超过空闲一个小时的连接</p>
+<pre><code>&lt;property name="minEvictableIdleTimeMillis"&gt;
+    &lt;value&gt;3600000&lt;/value&gt;
+&lt;/property&gt;
+&lt;property name="timeBetweenEvictionRunsMillis"&gt;
+    &lt;value&gt;600000&lt;/value&gt;
+&lt;/property&gt;
+</code></pre></div>
         </div>
 
         <footer class="col-md-12">
