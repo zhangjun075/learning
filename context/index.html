@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>设计模式 - 张均的笔记</title>
+        <title>springcontext - 张均的笔记</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -61,8 +61,8 @@
 </li>
                         </ul>
                     </li>
-                    <li class="active">
-                        <a href="./">设计模式</a>
+                    <li >
+                        <a href="../designPattern/">设计模式</a>
                     </li>
                     <li >
                         <a href="../docker/">docker</a>
@@ -109,7 +109,7 @@
 </li>
                         </ul>
                     </li>
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">spring <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
@@ -117,8 +117,8 @@
     <a href="../springboot/">springboot</a>
 </li>
                             
-<li >
-    <a href="../context/">springcontext</a>
+<li class="active">
+    <a href="./">springcontext</a>
 </li>
                         </ul>
                     </li>
@@ -131,12 +131,12 @@
                     </a>
                 </li>
                     <li >
-                        <a rel="next" href="../restfulapi/">
+                        <a rel="next" href="../springboot/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
-                    <li >
-                        <a rel="prev" href="../docker/">
+                    <li class="disabled">
+                        <a rel="prev" >
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -148,58 +148,109 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#observer-pattern">observer pattern</a></li>
+        <li class="main active"><a href="#spring-context">spring context</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="observer-pattern">observer pattern</h1>
-<p><img alt="" src="../images/observer.png" />
-* 被观察者</p>
-<pre><code>public class DemoObservable extends Observable {
-    private String param;
+<h1 id="spring-context">spring context</h1>
+<p>我们知道如果我们要在一个类使用spring提供的bean对象，我们需要把这个类注入到spring容器中，交给spring容器进行管理，但是在实际当中，我们往往会碰到在一个普通的Java类中，想直接使用spring提供的其他对象或者说有一些不需要交给spring管理，但是需要用到spring里的一些对象。如果这是spring框架的独立应用程序，我们通过</p>
+<p>ApplicationContext ac = new FileSystemXmlApplicationContext("applicationContext.xml");
+ac.getBean("beanId"); </p>
+<p>这样的方式就可以很轻易的获取我们所需要的对象。</p>
+<p>但是往往我们所做的都是Web Application，这时我们启动spring容器是通过在web.xml文件中配置，这样就不适合使用上面的方式在普通类去获取对象了，因为这样做就相当于加载了两次spring容器，而我们想是否可以通过在启动web服务器的时候，就把Application放在某一个类中，我们通过这个类在获取，这样就可以在普通类获取spring bean对象了，让我们接着往下看</p>
+<p>1.在Spring Boot可以扫描的包下</p>
+<p>写的工具类为SpringUtil，实现ApplicationContextAware接口，并加入Component注解，让spring扫描到该bean</p>
+<pre><code>package me.shijunjie.util;
 
-    public String getParam(){
-        return this.param;
-    }
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
-    public void setParam(String param){
-        this.param = param;
-        setChanged();
-        notifyObservers();
-    }
-}
-</code></pre>
+@Component
+public class SpringUtil implements ApplicationContextAware {
 
-<p>在状态变化的时候，需要改变状态通知，然后通知观察者。
-* 观察者</p>
-<pre><code>public class DemoObserver implements Observer {
+    private static ApplicationContext applicationContext;
+
     @Override
-    public void update(Observable o, Object arg) {
-        DemoObservable demoObservable = (DemoObservable) o;
-        System.out.println(&quot;观察者模式，接收到改变信息：&quot;+((DemoObservable) o).getParam());
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        if(SpringUtil.applicationContext == null) {
+            SpringUtil.applicationContext = applicationContext;
+        }
+        System.out.println(&quot;---------------------------------------------------------------------&quot;);
+
+        System.out.println(&quot;---------------------------------------------------------------------&quot;);
+
+        System.out.println(&quot;---------------me.shijunjie.util.SpringUtil------------------------------------------------------&quot;);
+
+        System.out.println(&quot;========ApplicationContext配置成功,在普通类可以通过调用SpringUtils.getAppContext()获取applicationContext对象,applicationContext=&quot;+SpringUtil.applicationContext+&quot;========&quot;);
+
+        System.out.println(&quot;---------------------------------------------------------------------&quot;);
     }
+
+    //获取applicationContext
+    public static ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    //通过name获取 Bean.
+    public static Object getBean(String name){
+        return getApplicationContext().getBean(name);
+    }
+
+    //通过class获取Bean.
+    public static &lt;T&gt; T getBean(Class&lt;T&gt; clazz){
+        return getApplicationContext().getBean(clazz);
+    }
+
+    //通过name,以及Clazz返回指定的Bean
+    public static &lt;T&gt; T getBean(String name,Class&lt;T&gt; clazz){
+        return getApplicationContext().getBean(name, clazz);
+    }
+
 }
 </code></pre>
 
-<p>观察者需要实现update方法。一般做法需要关注下update方法实现后，是否需要把状态改回来，即setChanged(false);</p>
-<ul>
-<li>测试类</li>
-</ul>
-<pre><code>public class TestDemo {
-    public static void main(String[] args){
-        DemoObservable demoObservable = new DemoObservable();
-        DemoObserver demoObserver = new DemoObserver();
-        demoObservable.addObserver(demoObserver);
-        demoObservable.setParam(&quot;123123&quot;);
+<p>为了测试，我们再启动的时候先通过代码方式给spring容器中注入一个bean，入下所示</p>
+<pre><code>package me.shijunjie.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import me.shijunjie.entity.Demo2;
+
+@Configuration
+public class BeanConfig {
+    @Bean(name=&quot;testDemo&quot;)
+    public Demo2 generateDemo() {
+        Demo2 demo = new Demo2();
+        demo.setId(12345);
+        demo.setName(&quot;test&quot;);
+        return demo;
     }
 }
+
 </code></pre>
 
-<ul>
-<li>测试结果</li>
-</ul>
-<pre><code>观察者模式，接收到改变信息：123123
+<p>然后我们编写测试controller，并从刚才写的springutil中获取这个bean</p>
+<pre><code>package me.shijunjie.controller;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import me.shijunjie.util.SpringUtil;
+
+@RestController
+@RequestMapping(&quot;/application&quot;)
+public class TestApplicationController {
+
+    @RequestMapping(&quot;/test1&quot;)
+    public Object testSpringUtil1() {
+        return SpringUtil.getBean(&quot;testDemo&quot;);
+    }
+
+}
 </code></pre></div>
         </div>
 
