@@ -5,7 +5,9 @@ pages:
         - netflix : microservice.md
         - restfulApi规范 : restfulapi.md
     - 设计模式 : designPattern.md
-    - docker : docker.md
+    - docker : 
+        - docker基础 : docker.md
+        - mysql-docker : mysql-docker.md
     - java :
         - 多线程 : thread.md
         - lambda : lambda.md

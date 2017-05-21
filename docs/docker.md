@@ -1175,3 +1175,8 @@ RUN apt-get update && apt-get install -y \
     如果不需要添加 tar 文件，推荐使用 COPY。
 ```
 
+
+# 镜像加速
+
+https://dashboard.daocloud.io
+
