@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>docker - 张均的笔记</title>
+        <title>docker基础 - 张均的笔记</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -64,8 +64,18 @@
                     <li >
                         <a href="../designPattern/">设计模式</a>
                     </li>
-                    <li class="active">
-                        <a href="./">docker</a>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">docker <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li class="active">
+    <a href="./">docker基础</a>
+</li>
+                            
+<li >
+    <a href="../mysql-docker/">mysql-docker</a>
+</li>
+                        </ul>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">java <b class="caret"></b></a>
@@ -136,7 +146,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../thread/">
+                        <a rel="prev" href="../mysql-docker/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -154,6 +164,7 @@
         <li class="main "><a href="#docker_3">Docker 端口映射</a></li>
         <li class="main "><a href="#docker_4">Docker 网络配置</a></li>
         <li class="main "><a href="#dockerfile">Dockerfile</a></li>
+        <li class="main "><a href="#_1">镜像加速</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
@@ -1182,7 +1193,10 @@ RUN apt-get update &amp;&amp; apt-get install -y \
     &amp;&amp; make -C /usr/src/things all
 
     如果不需要添加 tar 文件，推荐使用 COPY。
-</code></pre></div>
+</code></pre>
+
+<h1 id="_1">镜像加速</h1>
+<p>https://dashboard.daocloud.io</p></div>
         </div>
 
         <footer class="col-md-12">
