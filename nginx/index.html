@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>restfulApi规范 - 张均的笔记</title>
+        <title>docker-nginx - 张均的笔记</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -48,7 +48,7 @@
                     <li >
                         <a href="..">index</a>
                     </li>
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">微服务 <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
@@ -56,15 +56,15 @@
     <a href="../microservice/">netflix</a>
 </li>
                             
-<li class="active">
-    <a href="./">restfulApi规范</a>
+<li >
+    <a href="../restfulapi/">restfulApi规范</a>
 </li>
                         </ul>
                     </li>
                     <li >
                         <a href="../designPattern/">设计模式</a>
                     </li>
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">docker <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
@@ -76,8 +76,8 @@
     <a href="../mysql-docker/">docker-mysql</a>
 </li>
                             
-<li >
-    <a href="../nginx/">docker-nginx</a>
+<li class="active">
+    <a href="./">docker-nginx</a>
 </li>
                         </ul>
                     </li>
@@ -149,12 +149,12 @@
                     </a>
                 </li>
                     <li >
-                        <a rel="next" href="../microservice/">
+                        <a rel="next" href="../mysql-docker/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../designPattern/">
+                        <a rel="prev" href="../thread/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -166,158 +166,90 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#restful-api">Restful API 的设计规范</a></li>
-            <li><a href="#1uri">1.uri</a></li>
-            <li><a href="#2-request">2. Request</a></li>
-            <li><a href="#_4">待续。。。。。。。</a></li>
+        <li class="main active"><a href="#docker-nginx">docker 部署nginx</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="restful-api">Restful API 的设计规范</h1>
-<p>http://novoland.github.io/%E8%AE%BE%E8%AE%A1/2015/08/17/Restful%20API%20%E7%9A%84%E8%AE%BE%E8%AE%A1%E8%A7%84%E8%8C%83.html</p>
-<h2 id="1uri">1.uri</h2>
+<h1 id="docker-nginx">docker 部署nginx</h1>
+<p>在Docker下部署Nginx，包括：</p>
 <ul>
-<li>URI 表示资源，资源一般对应服务器端领域模型中的实体类。</li>
+<li>部署一个最简单的Nginx，可以通过80端口访问默认的网站</li>
+<li>设置记录访问和错误日志的路径</li>
+<li>设置静态网站的路径</li>
+<li>通过proxy_pass将HTTP请求反向代理到nodejs Web App</li>
+<li>设置HTTPS</li>
+<li>如果你还没有安装Docker环境，可参考在<a href="http://blog.shiqichan.com/Dockerizing-a-Node-js-Web-Application/">Docker中运行Node.js的Web应用</a>。</li>
 </ul>
-<h3 id="_1">规范</h3>
-<ul>
-<li>不用大写；</li>
-<li>用中杠-不用下杠_；</li>
-<li>参数列表要encode；</li>
-<li>URI中的名词表示资源集合，使用复数形式。\</li>
-</ul>
-<h3 id="vs">资源集合 vs 单个资源</h3>
-<p>URI表示资源的两种方式：资源集合、单个资源。</p>
-<ul>
-<li>资源集合：</li>
-</ul>
-<pre><code>/zoos //所有动物园
-/zoos/1/animals //id为1的动物园中的所有动物
+<p><strong>最简单的命令，让Nginx跑起来</strong></p>
+<pre><code>$ sudo docker run -it -p 80:80 dockerfile/nginx
 </code></pre>
 
+<p>如果是第一次，下载nginx镜像需要点时间。</p>
+<p>然后，可以通过浏览器根据地址访问到一个默认的网页，说明Nginx成功跑起来了。</p>
+<p><strong>设置记录访问和错误日志</strong></p>
+<p>Nginx有2个日志：</p>
 <ul>
-<li>单个资源：</li>
+<li>access.log，记录每个HTTP请求信息</li>
+<li>error.log，记录Nginx运行中的错误，用于排错</li>
 </ul>
-<pre><code>/zoos/1 //id为1的动物园
-/zoos/1;2;3 //id为1，2，3的动物园
+<pre><code>$ sudo docker run -it -p 80:80  -v `pwd`/logs:/var/log/nginx dockerfile/nginx
 </code></pre>
 
-<h3 id="uri">避免层级过深的URI</h3>
-<p>/在url中表达层级，用于按实体关联关系进行对象导航，一般根据id导航。</p>
-<p>过深的导航容易导致url膨胀，不易维护，如 GET /zoos/1/areas/3/animals/4，尽量使用查询参数代替路径中的实体导航，如GET /animals?zoo=1&amp;area=3；</p>
-<h3 id="composite">对Composite资源的访问</h3>
-<p>服务器端的组合实体必须在uri中通过父实体的id导航访问。</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>组合实体不是first-class的实体，它的生命周期完全依赖父实体，无法独立存在，在实现上通常是对数据库表中某些列的抽象，不直接对应表，也无id。一个常见的例子是 User — Address，Address是对User表中zipCode/country/city三个字段的简单抽象，无法独立于User存在。必须通过User索引到Address：GET /user/1/addresses</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<h2 id="2-request">2. Request</h2>
-<h3 id="http">HTTP方法</h3>
-<ul>
-<li>通过标准HTTP方法对资源CRUD</li>
-<li>GET：查询</li>
-</ul>
-<pre><code> GET /zoos
- GET /zoos/1
- GET /zoos/1/employees
+<p>这个命令会在当前目录下创建logs目录，存放access.log和error.log。</p>
+<p><strong>设置静态网站路径</strong></p>
+<p>需要创建目录：</p>
+<p>1、config，目录下放一个文件，名为server，Nginx静态网站配置文件</p>
+<p>2、www，目录下放html文件，比如index.htm</p>
+<p>server文件：</p>
+<pre><code>server {
+        listen 80;
+
+        root /www;
+        index index.html index.htm;
+
+        server_name localhost;
+}
 </code></pre>
 
-<ul>
-<li>POST：创建单个资源。POST一般向“资源集合”型uri发起</li>
-</ul>
-<pre><code>POST /animals  //新增动物
-POST /zoos/1/employees //为id为1的动物园雇佣员工
+<p>命令如下：</p>
+<pre><code>sudo docker run -it -p 80:80 -v `pwd`/www:/www -v `pwd`/config:/etc/nginx/sites-enabled  -v `pwd`/logs:/var/log/nginx dockerfile/nginx
 </code></pre>
 
-<ul>
-<li>PUT：更新单个资源（全量），客户端提供完整的更新后的资源。与之对应的是 PATCH，PATCH 负责部分更新，客户端提供要更新的那些字段。PUT/PATCH一般向“单个资源”型uri发起</li>
-</ul>
-<pre><code>PUT /animals/1
-PUT /zoos/1
+<p>解释一下：</p>
+<pre><code>-vpwd/www:/www，将当前路径下的www目录设置为/www，和server配置的路径对应
+-vpwd/config:/etc/nginx/sites-enabled，server文件的本地路径，映射到docker容器的nginx配置路径
 </code></pre>
 
-<ul>
-<li>DELETE：删除</li>
-</ul>
-<pre><code>DELETE /zoos/1/employees/2
-DELETE /zoos/1/employees/2;4;5
-DELETE /zoos/1/animals  //删除id为1的动物园内的所有动物
+<p><strong>设置反向代理到Nodejs Web App</strong></p>
+<p>需要先能将Nodejs的容器跑起来，然后再考虑怎样通过Nginx的反向代理。</p>
+<p>可参见<a href="http://blog.shiqichan.com/Dockerizing-a-Node-js-Web-Application/">在Docker中运行Node.js的Web应用</a></p>
+<p>假设我有个express.js项目，在当前目录下的webapp目录中，使用docker命令类似这样：</p>
+<pre><code>sudo docker run -d -p 3000:3000 --name ProtoWebApp -v `pwd`/webapp:/webapp -w /webapp  node npm start
 </code></pre>
 
-<h3 id="_2">安全性和幂等性</h3>
-<ul>
-<li>安全性：不会改变资源状态，可以理解为只读的；</li>
-<li>幂等性：执行1次和执行N次，对资源状态改变的效果是等价的。</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>安全性</th>
-<th>幂等性</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>GET</td>
-<td>√</td>
-<td>√</td>
-</tr>
-<tr>
-<td>POST</td>
-<td>×</td>
-<td>×</td>
-</tr>
-<tr>
-<td>PUT</td>
-<td>×</td>
-<td>√</td>
-</tr>
-<tr>
-<td>DELETE</td>
-<td>×</td>
-<td>√</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>安全性和幂等性均不保证反复请求能拿到相同的response。以 DELETE 为例，第一次DELETE返回200表示删除成功，第二次返回404提示资源不存在，这是允许的。</li>
-</ul>
-<h3 id="_3">复杂查询</h3>
-<ul>
-<li>查询可以捎带以下参数：</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>.</th>
-<th>示例</th>
-<th>备注</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>过滤条件</td>
-<td>?type=1&amp;age=16</td>
-<td>允许一定的uri冗余，如/zoos/1与/zoos?id=1</td>
-</tr>
-<tr>
-<td>排序</td>
-<td>?sort=age,desc</td>
-<td></td>
-</tr>
-<tr>
-<td>分页</td>
-<td>?limit=10&amp;offset=3</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h2 id="_4">待续。。。。。。。</h2></div>
+<p>然后，将前面例子中config目录下的server文件做点改动：</p>
+<pre><code>server {
+        listen 80;
+
+        #root /www;
+        #index index.html index.htm;
+
+        server_name localhost;
+
+        location / {
+                proxy_pass  http://localhost:3000;
+        }
+}
+</code></pre>
+
+<p>之后，用下面的命令将nginx跑起来：</p>
+<pre><code>sudo docker run -it -p 80:80 --link ProtoWebApp:localhost -v `pwd`/config:/etc/nginx/sites-enabled  -v `pwd`/logs:/var/log/nginx dockerfile/nginx
+</code></pre>
+
+<p><strong>设置HTTPS</strong>
+只需在运行nginx容器的时候设置SSL的路径：-v <certs-dir>:/etc/nginx/certs。</p>
+<p>当然，nginx首先要设置，参见<a href="http://nginx.org/cn/docs/http/configuring_https_servers.html">配置HTTPS服务器</a></p></div>
         </div>
 
         <footer class="col-md-12">
