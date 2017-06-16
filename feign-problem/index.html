@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>docker-nginx - 张均的笔记</title>
+        <title>feign使用问题 - 张均的笔记</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -48,7 +48,7 @@
                     <li >
                         <a href="..">index</a>
                     </li>
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">微服务 <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
@@ -60,15 +60,15 @@
     <a href="../restfulapi/">restfulApi规范</a>
 </li>
                             
-<li >
-    <a href="../feign-problem/">feign使用问题</a>
+<li class="active">
+    <a href="./">feign使用问题</a>
 </li>
                         </ul>
                     </li>
                     <li >
                         <a href="../designPattern/">设计模式</a>
                     </li>
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">docker <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
@@ -80,8 +80,8 @@
     <a href="../mysql-docker/">docker-mysql</a>
 </li>
                             
-<li class="active">
-    <a href="./">docker-nginx</a>
+<li >
+    <a href="../nginx/">docker-nginx</a>
 </li>
                         </ul>
                     </li>
@@ -153,12 +153,12 @@
                     </a>
                 </li>
                     <li >
-                        <a rel="next" href="../mysql-docker/">
+                        <a rel="next" href="../restfulapi/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../thread/">
+                        <a rel="prev" href="../designPattern/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -170,90 +170,115 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#docker-nginx">docker 部署nginx</a></li>
+        <li class="main active"><a href="#spring-cloudfeign401407">Spring Cloud项目中通过Feign进行内部服务调用发生401\407错误无返回信息的问题</a></li>
+            <li><a href="#_1">问题描述</a></li>
+            <li><a href="#_2">产生原因</a></li>
+            <li><a href="#_3">解决思路</a></li>
+            <li><a href="#_4">源码解析</a></li>
+            <li><a href="#_5">解决方法</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="docker-nginx">docker 部署nginx</h1>
-<p>在Docker下部署Nginx，包括：</p>
-<ul>
-<li>部署一个最简单的Nginx，可以通过80端口访问默认的网站</li>
-<li>设置记录访问和错误日志的路径</li>
-<li>设置静态网站的路径</li>
-<li>通过proxy_pass将HTTP请求反向代理到nodejs Web App</li>
-<li>设置HTTPS</li>
-<li>如果你还没有安装Docker环境，可参考在<a href="http://blog.shiqichan.com/Dockerizing-a-Node-js-Web-Application/">Docker中运行Node.js的Web应用</a>。</li>
-</ul>
-<p><strong>最简单的命令，让Nginx跑起来</strong></p>
-<pre><code>$ sudo docker run -it -p 80:80 dockerfile/nginx
-</code></pre>
+<h1 id="spring-cloudfeign401407">Spring Cloud项目中通过Feign进行内部服务调用发生401\407错误无返回信息的问题</h1>
+<h2 id="_1">问题描述</h2>
+<p>最近在使用Spring Cloud改造现有服务的工作中，在内部服务的调用方式上选择了Feign组件，由于服务与服务之间有权限控制，发现通过Feign来进行调用时如果发生了401、407错误时，调用方不能够取回被调用方返回的错误信息。</p>
+<h2 id="_2">产生原因</h2>
+<p>Feign默认使用java.net.HttpURLConnection进行通信，通过查看其子类sun.net.www.protocol.http.HttpURLConnection源码发现代码中在进行通信时单独对错误码为401\407的错误请求做了处理，当请求的错误码为401\407时，会关闭请求流，由于此时还并没有将返回的错误信息写入响应流中，所以接收的返回信息中仅仅能获取到response.status()，而response.body()为null。
+HttpURLConnection相关信息的源码链接：http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/sun/net/www/protocol/http/HttpURLConnection.java#1079</p>
+<h2 id="_3">解决思路</h2>
+<p>关于此问题产生的原因已经很明显了，就是feign.Client实现通信的方式选用了我们不想使用的HttpURLConnection。想到通常在Spring的代码中OCP都是运用得很好的，所以基本上有解决此问题的信心了，最不济就是自己扩展Feign，实现一个自己想要的feign.Client，当然这种事情Spring Cloud基本都会自己搞定，这也是Spring Cloud强大完善的一个地方。
+通过这个思路查看源码，果然看到了Spring Cloud在使用Feign提前内置了三种通信方式（feign.Client.Default，feign.httpclient.ApacheHttpClient，feign.okhttp.OkHttpClient），其中缺省的情况使用的就是feign.Client.Default，这个就是使用HttpURLConnection通信的方式。</p>
+<h2 id="_4">源码解析</h2>
+<p>在Spring Cloud项目中使用了Ribbon的组件，其会帮助我们管理使用Feign，查看org.springframework.cloud.netflix.feign.ribbon.FeignRibbonClientAutoConfiguration源码</p>
+<pre><code>@ConditionalOnClass({ ILoadBalancer.class, Feign.class })
+@Configuration
+@AutoConfigureBefore(FeignAutoConfiguration.class)
+public class FeignRibbonClientAutoConfiguration {
 
-<p>如果是第一次，下载nginx镜像需要点时间。</p>
-<p>然后，可以通过浏览器根据地址访问到一个默认的网页，说明Nginx成功跑起来了。</p>
-<p><strong>设置记录访问和错误日志</strong></p>
-<p>Nginx有2个日志：</p>
-<ul>
-<li>access.log，记录每个HTTP请求信息</li>
-<li>error.log，记录Nginx运行中的错误，用于排错</li>
-</ul>
-<pre><code>$ sudo docker run -it -p 80:80  -v `pwd`/logs:/var/log/nginx dockerfile/nginx
-</code></pre>
+        @Bean
+    @ConditionalOnMissingBean
+    public Client feignClient(CachingSpringLoadBalancerFactory cachingFactory,
+            SpringClientFactory clientFactory) {
+        return new LoadBalancerFeignClient(new Client.Default(null, null),
+                cachingFactory, clientFactory);
+    }
 
-<p>这个命令会在当前目录下创建logs目录，存放access.log和error.log。</p>
-<p><strong>设置静态网站路径</strong></p>
-<p>需要创建目录：</p>
-<p>1、config，目录下放一个文件，名为server，Nginx静态网站配置文件</p>
-<p>2、www，目录下放html文件，比如index.htm</p>
-<p>server文件：</p>
-<pre><code>server {
-        listen 80;
+        @Configuration
+    @ConditionalOnClass(ApacheHttpClient.class)
+    @ConditionalOnProperty(value = &quot;feign.httpclient.enabled&quot;, matchIfMissing = true)
+    protected static class HttpClientFeignLoadBalancedConfiguration {
 
-        root /www;
-        index index.html index.htm;
+        @Autowired(required = false)
+        private HttpClient httpClient;
 
-        server_name localhost;
-}
-</code></pre>
-
-<p>命令如下：</p>
-<pre><code>sudo docker run -it -p 80:80 -v `pwd`/www:/www -v `pwd`/config:/etc/nginx/sites-enabled  -v `pwd`/logs:/var/log/nginx dockerfile/nginx
-</code></pre>
-
-<p>解释一下：</p>
-<pre><code>-vpwd/www:/www，将当前路径下的www目录设置为/www，和server配置的路径对应
--vpwd/config:/etc/nginx/sites-enabled，server文件的本地路径，映射到docker容器的nginx配置路径
-</code></pre>
-
-<p><strong>设置反向代理到Nodejs Web App</strong></p>
-<p>需要先能将Nodejs的容器跑起来，然后再考虑怎样通过Nginx的反向代理。</p>
-<p>可参见<a href="http://blog.shiqichan.com/Dockerizing-a-Node-js-Web-Application/">在Docker中运行Node.js的Web应用</a></p>
-<p>假设我有个express.js项目，在当前目录下的webapp目录中，使用docker命令类似这样：</p>
-<pre><code>sudo docker run -d -p 3000:3000 --name ProtoWebApp -v `pwd`/webapp:/webapp -w /webapp  node npm start
-</code></pre>
-
-<p>然后，将前面例子中config目录下的server文件做点改动：</p>
-<pre><code>server {
-        listen 80;
-
-        #root /www;
-        #index index.html index.htm;
-
-        server_name localhost;
-
-        location / {
-                proxy_pass  http://localhost:3000;
+        @Bean
+        @ConditionalOnMissingBean(Client.class)
+        public Client feignClient(CachingSpringLoadBalancerFactory cachingFactory,
+                SpringClientFactory clientFactory) {
+            ApacheHttpClient delegate;
+            if (this.httpClient != null) {
+                delegate = new ApacheHttpClient(this.httpClient);
+            }
+            else {
+                delegate = new ApacheHttpClient();
+            }
+            return new LoadBalancerFeignClient(delegate, cachingFactory, clientFactory);
         }
+    }
+
+    @Configuration
+    @ConditionalOnClass(OkHttpClient.class)
+    @ConditionalOnProperty(value = &quot;feign.okhttp.enabled&quot;, matchIfMissing = true)
+    protected static class OkHttpFeignLoadBalancedConfiguration {
+
+        @Autowired(required = false)
+        private okhttp3.OkHttpClient okHttpClient;
+
+        @Bean
+        @ConditionalOnMissingBean(Client.class)
+        public Client feignClient(CachingSpringLoadBalancerFactory cachingFactory,
+                SpringClientFactory clientFactory) {
+            OkHttpClient delegate;
+            if (this.okHttpClient != null) {
+                delegate = new OkHttpClient(this.okHttpClient);
+            }
+            else {
+                delegate = new OkHttpClient();
+            }
+            return new LoadBalancerFeignClient(delegate, cachingFactory, clientFactory);
+        }
+    }
 }
 </code></pre>
 
-<p>之后，用下面的命令将nginx跑起来：</p>
-<pre><code>sudo docker run -it -p 80:80 --link ProtoWebApp:localhost -v `pwd`/config:/etc/nginx/sites-enabled  -v `pwd`/logs:/var/log/nginx dockerfile/nginx
+<ul>
+<li>从feignClient(CachingSpringLoadBalancerFactory cachingFactory, SpringClientFactory clientFactory) 方法结合其上注解我们可以很清楚的知道，当没有feign.ClientBean的时候会默认生成feign.Client.Default来进行通信，这就是之前说的缺省通信方式</li>
+<li>从HttpClientFeignLoadBalancedConfiguration、OkHttpFeignLoadBalancedConfiguration，我们可以看到其生效的条件，当classpath中有feign.httpclient.ApacheHttpClient并且配置feign.httpclient.enabled=true（缺省为true）、feign.okhttp.OkHttpClient并且配置feign.okhttp.enabled=true（缺省为true）</li>
+<li>当使用ApacheHttpClient或者OkHttpClient进行通信时就不会导致发生401\407错误时，取不到返回的错误信息了</li>
+</ul>
+<h2 id="_5">解决方法</h2>
+<p>通过其上的分析，解决方法已经显而易见了</p>
+<p>1、pom.xml文件中新增</p>
+<pre><code>&lt;dependency&gt;
+         &lt;groupId&gt;com.netflix.feign&lt;/groupId&gt;
+         &lt;artifactId&gt;feign-okhttp&lt;/artifactId&gt;
+         &lt;version&gt;8.18.0&lt;/version&gt;
+   &lt;/dependency&gt;
 </code></pre>
 
-<p><strong>设置HTTPS</strong>
-只需在运行nginx容器的时候设置SSL的路径：-v <certs-dir>:/etc/nginx/certs。</p>
-<p>当然，nginx首先要设置，参见<a href="http://nginx.org/cn/docs/http/configuring_https_servers.html">配置HTTPS服务器</a></p></div>
+<p>或者</p>
+<pre><code>&lt;dependency&gt;
+         &lt;groupId&gt;com.netflix.feign&lt;/groupId&gt;
+         &lt;artifactId&gt;feign-httpclient&lt;/artifactId&gt;
+         &lt;version&gt;8.18.0&lt;/version&gt;
+   &lt;/dependency&gt;
+</code></pre>
+
+<p>2、application.properties文件中增加（可缺省，如有切换调用方式需求可添加配置进行控制）</p>
+<p>feign.okhttp.enabled=true</p>
+<p>或者</p>
+<p>feign.httpclient.enabled=true</p></div>
         </div>
 
         <footer class="col-md-12">
