@@ -4,10 +4,12 @@ pages:
     - 微服务 :
         - netflix : microservice.md
         - restfulApi规范 : restfulapi.md
+        - feign使用问题 : feign-problem.md
     - 设计模式 : designPattern.md
     - docker : 
         - docker基础 : docker.md
-        - mysql-docker : mysql-docker.md
+        - docker-mysql : mysql-docker.md
+        - docker-nginx : nginx.md
     - java :
         - 多线程 : thread.md
         - lambda : lambda.md
