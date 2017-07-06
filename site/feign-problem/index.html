@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>springboot - 张均的笔记</title>
+        <title>feign使用问题 - 张均的笔记</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -48,7 +48,7 @@
                     <li >
                         <a href="..">index</a>
                     </li>
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">微服务 <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
@@ -60,8 +60,8 @@
     <a href="../restfulapi/">restfulApi规范</a>
 </li>
                             
-<li >
-    <a href="../feign-problem/">feign使用问题</a>
+<li class="active">
+    <a href="./">feign使用问题</a>
 </li>
                         </ul>
                     </li>
@@ -135,12 +135,12 @@
 </li>
                         </ul>
                     </li>
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">spring <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
-<li class="active">
-    <a href="./">springboot</a>
+<li >
+    <a href="../springboot/">springboot</a>
 </li>
                             
 <li >
@@ -157,12 +157,12 @@
                     </a>
                 </li>
                     <li >
-                        <a rel="next" href="../dbpool/">
+                        <a rel="next" href="../restfulapi/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../context/">
+                        <a rel="prev" href="../designPattern/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -174,68 +174,115 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#springboot">Springboot 优雅停机</a></li>
+        <li class="main active"><a href="#spring-cloudfeign401407">Spring Cloud项目中通过Feign进行内部服务调用发生401\407错误无返回信息的问题</a></li>
+            <li><a href="#_1">问题描述</a></li>
+            <li><a href="#_2">产生原因</a></li>
+            <li><a href="#_3">解决思路</a></li>
+            <li><a href="#_4">源码解析</a></li>
+            <li><a href="#_5">解决方法</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="springboot">Springboot 优雅停机</h1>
-<p>如何优雅地停止运行中的内嵌Tomcat的Spring Boot应用</p>
-<p>你很可能根据https://spring.io/guides/gs/rest-service/搭起了一个Spring的Rest服务，然后打包成了jar包，不需要容器就可以在生成环境下通过运行jar包启动一个Web服务。</p>
-<p>但这样的服务怎么样正确的停止呢？或许你只是简单的kill -9对应的进程，但实际上，有更优雅的方式。</p>
-<p>Spring Boot里面有一个spring-boot-starter-actuator的项目，可以监控和管理Spring Boot应用。其中暴露了很多endpoint,可以方便的检测应用的健康情况。其中有一个shutdown的endpoint可以优雅地停止应用。</p>
+<h1 id="spring-cloudfeign401407">Spring Cloud项目中通过Feign进行内部服务调用发生401\407错误无返回信息的问题</h1>
+<h2 id="_1">问题描述</h2>
+<p>最近在使用Spring Cloud改造现有服务的工作中，在内部服务的调用方式上选择了Feign组件，由于服务与服务之间有权限控制，发现通过Feign来进行调用时如果发生了401、407错误时，调用方不能够取回被调用方返回的错误信息。</p>
+<h2 id="_2">产生原因</h2>
+<p>Feign默认使用java.net.HttpURLConnection进行通信，通过查看其子类sun.net.www.protocol.http.HttpURLConnection源码发现代码中在进行通信时单独对错误码为401\407的错误请求做了处理，当请求的错误码为401\407时，会关闭请求流，由于此时还并没有将返回的错误信息写入响应流中，所以接收的返回信息中仅仅能获取到response.status()，而response.body()为null。
+HttpURLConnection相关信息的源码链接：http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/sun/net/www/protocol/http/HttpURLConnection.java#1079</p>
+<h2 id="_3">解决思路</h2>
+<p>关于此问题产生的原因已经很明显了，就是feign.Client实现通信的方式选用了我们不想使用的HttpURLConnection。想到通常在Spring的代码中OCP都是运用得很好的，所以基本上有解决此问题的信心了，最不济就是自己扩展Feign，实现一个自己想要的feign.Client，当然这种事情Spring Cloud基本都会自己搞定，这也是Spring Cloud强大完善的一个地方。
+通过这个思路查看源码，果然看到了Spring Cloud在使用Feign提前内置了三种通信方式（feign.Client.Default，feign.httpclient.ApacheHttpClient，feign.okhttp.OkHttpClient），其中缺省的情况使用的就是feign.Client.Default，这个就是使用HttpURLConnection通信的方式。</p>
+<h2 id="_4">源码解析</h2>
+<p>在Spring Cloud项目中使用了Ribbon的组件，其会帮助我们管理使用Feign，查看org.springframework.cloud.netflix.feign.ribbon.FeignRibbonClientAutoConfiguration源码</p>
+<pre><code>@ConditionalOnClass({ ILoadBalancer.class, Feign.class })
+@Configuration
+@AutoConfigureBefore(FeignAutoConfiguration.class)
+public class FeignRibbonClientAutoConfiguration {
+
+        @Bean
+    @ConditionalOnMissingBean
+    public Client feignClient(CachingSpringLoadBalancerFactory cachingFactory,
+            SpringClientFactory clientFactory) {
+        return new LoadBalancerFeignClient(new Client.Default(null, null),
+                cachingFactory, clientFactory);
+    }
+
+        @Configuration
+    @ConditionalOnClass(ApacheHttpClient.class)
+    @ConditionalOnProperty(value = &quot;feign.httpclient.enabled&quot;, matchIfMissing = true)
+    protected static class HttpClientFeignLoadBalancedConfiguration {
+
+        @Autowired(required = false)
+        private HttpClient httpClient;
+
+        @Bean
+        @ConditionalOnMissingBean(Client.class)
+        public Client feignClient(CachingSpringLoadBalancerFactory cachingFactory,
+                SpringClientFactory clientFactory) {
+            ApacheHttpClient delegate;
+            if (this.httpClient != null) {
+                delegate = new ApacheHttpClient(this.httpClient);
+            }
+            else {
+                delegate = new ApacheHttpClient();
+            }
+            return new LoadBalancerFeignClient(delegate, cachingFactory, clientFactory);
+        }
+    }
+
+    @Configuration
+    @ConditionalOnClass(OkHttpClient.class)
+    @ConditionalOnProperty(value = &quot;feign.okhttp.enabled&quot;, matchIfMissing = true)
+    protected static class OkHttpFeignLoadBalancedConfiguration {
+
+        @Autowired(required = false)
+        private okhttp3.OkHttpClient okHttpClient;
+
+        @Bean
+        @ConditionalOnMissingBean(Client.class)
+        public Client feignClient(CachingSpringLoadBalancerFactory cachingFactory,
+                SpringClientFactory clientFactory) {
+            OkHttpClient delegate;
+            if (this.okHttpClient != null) {
+                delegate = new OkHttpClient(this.okHttpClient);
+            }
+            else {
+                delegate = new OkHttpClient();
+            }
+            return new LoadBalancerFeignClient(delegate, cachingFactory, clientFactory);
+        }
+    }
+}
+</code></pre>
+
 <ul>
-<li>Maven基本配置</li>
+<li>从feignClient(CachingSpringLoadBalancerFactory cachingFactory, SpringClientFactory clientFactory) 方法结合其上注解我们可以很清楚的知道，当没有feign.ClientBean的时候会默认生成feign.Client.Default来进行通信，这就是之前说的缺省通信方式</li>
+<li>从HttpClientFeignLoadBalancedConfiguration、OkHttpFeignLoadBalancedConfiguration，我们可以看到其生效的条件，当classpath中有feign.httpclient.ApacheHttpClient并且配置feign.httpclient.enabled=true（缺省为true）、feign.okhttp.OkHttpClient并且配置feign.okhttp.enabled=true（缺省为true）</li>
+<li>当使用ApacheHttpClient或者OkHttpClient进行通信时就不会导致发生401\407错误时，取不到返回的错误信息了</li>
 </ul>
-<p><strong>增加依赖</strong></p>
+<h2 id="_5">解决方法</h2>
+<p>通过其上的分析，解决方法已经显而易见了</p>
+<p>1、pom.xml文件中新增</p>
 <pre><code>&lt;dependency&gt;
-    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
-&lt;/dependency&gt;
+         &lt;groupId&gt;com.netflix.feign&lt;/groupId&gt;
+         &lt;artifactId&gt;feign-okhttp&lt;/artifactId&gt;
+         &lt;version&gt;8.18.0&lt;/version&gt;
+   &lt;/dependency&gt;
 </code></pre>
 
-<p><strong>配置文件配置启用shutdown的HTTP访</strong></p>
-<pre><code>#启用 shutdown endpoint的HTTP访问
-endpoints.shutdown.enabled=true
-#不需要用户名密码验证 
-endpoints.shutdown.sensitive=false
-</code></pre>
-
-<p><strong>POST请求到shutdown路径</strong></p>
-<p>以上配置完成后，可以使用curl -X POST localhost:port/shutdown发动post请求，即可优雅的停止应用：</p>
-<pre><code>curl -X POST localhost:8088/manage/shutdown      
-{&quot;message&quot;:&quot;Shutting down, bye...&quot;}
-</code></pre>
-
-<p><strong>密码安全配置</strong></p>
-<p>若需要安全验证，则需要以下依赖：</p>
+<p>或者</p>
 <pre><code>&lt;dependency&gt;
-  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-  &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
-&lt;/dependency&gt;
+         &lt;groupId&gt;com.netflix.feign&lt;/groupId&gt;
+         &lt;artifactId&gt;feign-httpclient&lt;/artifactId&gt;
+         &lt;version&gt;8.18.0&lt;/version&gt;
+   &lt;/dependency&gt;
 </code></pre>
 
-<p>并配置你想要密码验证的endpoint的sensitive=true.</p>
-<pre><code>endpoints.shutdown.sensitive=true
-</code></pre>
-
-<p>在application.properties文件配置对应的密码：</p>
-<pre><code>security.user.name=admin
-security.user.password=secret
-management.security.role=SUPERUSER
-</code></pre>
-
-<p><strong>路径/端口/ip访问限制</strong></p>
-<p>很可能这种监控你只需要在本机访问（如只有本机才能关闭应用），若需要如此，可以考虑以下管理配置</p>
-<pre><code>##management endpoint的路径，默认为/
-management.context-path=/manage
-
-##management endpoint的监听端口
-management.port=8081
-
-##management endpoint只允许来自本机的连接
-management.address=127.0.0.1
-</code></pre></div>
+<p>2、application.properties文件中增加（可缺省，如有切换调用方式需求可添加配置进行控制）</p>
+<p>feign.okhttp.enabled=true</p>
+<p>或者</p>
+<p>feign.httpclient.enabled=true</p></div>
         </div>
 
         <footer class="col-md-12">

@@ -59,6 +59,10 @@
 <li >
     <a href="../restfulapi/">restfulApi规范</a>
 </li>
+                            
+<li >
+    <a href="../feign-problem/">feign使用问题</a>
+</li>
                         </ul>
                     </li>
                     <li >
@@ -78,6 +82,10 @@
                             
 <li class="active">
     <a href="./">docker-nginx</a>
+</li>
+                            
+<li >
+    <a href="../docker0/">修改docker0</a>
 </li>
                         </ul>
                     </li>
@@ -154,7 +162,7 @@
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../thread/">
+                        <a rel="prev" href="../docker0/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -214,6 +222,10 @@
 
 <p>命令如下：</p>
 <pre><code>sudo docker run -it -p 80:80 -v `pwd`/www:/www -v `pwd`/config:/etc/nginx/sites-enabled  -v `pwd`/logs:/var/log/nginx dockerfile/nginx
+</code></pre>
+
+<p>或者如下命令：</p>
+<pre><code>docker run -d -p 80:80 -v /Users/junzhang/data/nginx/logs/:/var/log/nginx/ -v /Users/junzhang/data/nginx/html/:/www --name nginx1 nginx
 </code></pre>
 
 <p>解释一下：</p>

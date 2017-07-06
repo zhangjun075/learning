@@ -58,6 +58,11 @@ server {
 sudo docker run -it -p 80:80 -v `pwd`/www:/www -v `pwd`/config:/etc/nginx/sites-enabled  -v `pwd`/logs:/var/log/nginx dockerfile/nginx
 ```
 
+或者如下命令：
+```
+docker run -d -p 80:80 -v /Users/junzhang/data/nginx/logs/:/var/log/nginx/ -v /Users/junzhang/data/nginx/html/:/www --name nginx1 nginx
+```
+
 解释一下：
 ```
 -vpwd/www:/www，将当前路径下的www目录设置为/www，和server配置的路径对应
