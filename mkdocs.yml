@@ -19,10 +19,14 @@ pages:
         - swagger : swagger.md
         - 令牌桶 : limiting.md
         - 代理(字节码) : javassit.md
+        - jvm内存分析 : jvm.md
     - 数据库 :
         - db事务 : trans.md
         - 连接池 : dbpool.md
     - spring :
         - springboot : springboot.md
         - springcontext: context.md
+    - Linux :
+        - netstat命令 : linux.md
+        - nginx安装 : centos7-nginx.md 
 #theme: readthedocs
