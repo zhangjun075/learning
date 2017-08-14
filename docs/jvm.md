@@ -59,3 +59,9 @@ S0C：年轻代中第一个survivor（幸存区）的容量 (字节)
          TT： 持有次数限制 
          MTT ： 最大持有次数限制 
 ```
+
+## 查看jvm进程中线程占用
+* jps（查看java进程）
+* top -Hp xxx(查看进程中线程的占用情况)
+* printf "%x\n" xxx （查看16进制）
+* jstack xxx |grep xxx（查看线程情况）
