@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>netstat命令 - 张均的笔记</title>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+	
+	<script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="..">张均的笔记</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="..">index</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">微服务 <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../microservice/">netflix</a>
+</li>
+                            
+<li >
+    <a href="../restfulapi/">restfulApi规范</a>
+</li>
+                            
+<li >
+    <a href="../feign-problem/">feign使用问题</a>
+</li>
+                        </ul>
+                    </li>
+                    <li >
+                        <a href="../designPattern/">设计模式</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">docker <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../docker/">docker基础</a>
+</li>
+                            
+<li >
+    <a href="../mysql-docker/">docker-mysql</a>
+</li>
+                            
+<li >
+    <a href="../nginx/">docker-nginx</a>
+</li>
+                            
+<li >
+    <a href="../docker0/">修改docker0</a>
+</li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">java <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../thread/">多线程</a>
+</li>
+                            
+<li >
+    <a href="../lambda/">lambda</a>
+</li>
+                            
+<li >
+    <a href="../JSR310/">JSR310-日期</a>
+</li>
+                            
+<li >
+    <a href="../gc/">jvm及GC</a>
+</li>
+                            
+<li >
+    <a href="../swagger/">swagger</a>
+</li>
+                            
+<li >
+    <a href="../limiting/">令牌桶</a>
+</li>
+                            
+<li >
+    <a href="../javassit/">代理(字节码)</a>
+</li>
+                            
+<li >
+    <a href="../jvm/">jvm内存分析</a>
+</li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">数据库 <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../trans/">db事务</a>
+</li>
+                            
+<li >
+    <a href="../dbpool/">连接池</a>
+</li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">spring <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../springboot/">springboot</a>
+</li>
+                            
+<li >
+    <a href="../context/">springcontext</a>
+</li>
+                        </ul>
+                    </li>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Linux <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li class="active">
+    <a href="./">netstat命令</a>
+</li>
+                            
+<li >
+    <a href="../centos7-nginx/">nginx安装</a>
+</li>
+                        </ul>
+                    </li>
+                </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="../context/">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../centos7-nginx/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#linux-netstat">linux netstat命令详解</a></li>
+            <li><a href="#_1">输出信息含义</a></li>
+            <li><a href="#_2">常见参数</a></li>
+            <li><a href="#_3">实用命令实例</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h1 id="linux-netstat">linux netstat命令详解</h1>
+<p>Netstat 命令用于显示各种网络相关信息，如网络连接，路由表，接口状态 (Interface Statistics)，masquerade 连接，多播成员 (Multicast Memberships) 等等。</p>
+<h2 id="_1">输出信息含义</h2>
+<pre><code>Active Internet connections (w/o servers)
+Proto Recv-Q Send-Q Local Address Foreign Address State
+tcp 0 2 210.34.6.89:telnet 210.34.6.96:2873 ESTABLISHED
+tcp 296 0 210.34.6.89:1165 210.34.6.84:netbios-ssn ESTABLISHED
+tcp 0 0 localhost.localdom:9001 localhost.localdom:1162 ESTABLISHED
+tcp 0 0 localhost.localdom:1162 localhost.localdom:9001 ESTABLISHED
+tcp 0 80 210.34.6.89:1161 210.34.6.10:netbios-ssn CLOSE
+
+Active UNIX domain sockets (w/o servers)
+Proto RefCnt Flags Type State I-Node Path
+unix 1 [ ] STREAM CONNECTED 16178 @000000dd
+unix 1 [ ] STREAM CONNECTED 16176 @000000dc
+unix 9 [ ] DGRAM 5292 /dev/log
+unix 1 [ ] STREAM CONNECTED 16182 @000000df
+</code></pre>
+
+<p>从整体上看，netstat的输出结果可以分为两个部分：</p>
+<p>一个是Active Internet connections，称为有源TCP连接，其中"Recv-Q"和"Send-Q"指%0A的是接收队列和发送队列。这些数字一般都应该是0。如果不是则表示软件包正在队列中堆积。这种情况只能在非常少的情况见到。</p>
+<p>另一个是Active UNIX domain sockets，称为有源Unix域套接口(和网络套接字一样，但是只能用于本机通信，性能可以提高一倍)。
+Proto显示连接使用的协议,RefCnt表示连接到本套接口上的进程号,Types显示套接口的类型,State显示套接口当前的状态,Path表示连接到套接口的其它进程使用的路径名。</p>
+<h2 id="_2">常见参数</h2>
+<pre><code>-a (all)显示所有选项，默认不显示LISTEN相关
+-t (tcp)仅显示tcp相关选项
+-u (udp)仅显示udp相关选项
+-n 拒绝显示别名，能显示数字的全部转化成数字。
+-l 仅列出有在 Listen (监听) 的服務状态
+
+-p 显示建立相关链接的程序名
+-r 显示路由信息，路由表
+-e 显示扩展信息，例如uid等
+-s 按各个协议进行统计
+-c 每隔一个固定时间，执行该netstat命令。
+
+提示：LISTEN和LISTENING的状态只有用-a或者-l才能看到
+</code></pre>
+
+<h2 id="_3">实用命令实例</h2>
+<p><strong> 1. 列出所有端口 (包括监听和未监听的) </strong></p>
+<h3 id="netstat-a">列出所有端口 netstat -a</h3>
+<pre><code># netstat -a | more
+ Active Internet connections (servers and established)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ tcp        0      0 localhost:30037         *:*                     LISTEN
+ udp        0      0 *:bootpc                *:*
+
+Active UNIX domain sockets (servers and established)
+ Proto RefCnt Flags       Type       State         I-Node   Path
+ unix  2      [ ACC ]     STREAM     LISTENING     6135     /tmp/.X11-unix/X0
+ unix  2      [ ACC ]     STREAM     LISTENING     5140     /var/run/acpid.socket
+</code></pre>
+
+<h3 id="tcp-netstat-at">列出所有 tcp 端口 netstat -at</h3>
+<pre><code># netstat -at
+ Active Internet connections (servers and established)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ tcp        0      0 localhost:30037         *:*                     LISTEN
+ tcp        0      0 localhost:ipp           *:*                     LISTEN
+ tcp        0      0 *:smtp                  *:*                     LISTEN
+ tcp6       0      0 localhost:ipp           [::]:*                  LISTEN
+</code></pre>
+
+<h3 id="udp-netstat-au">列出所有 udp 端口 netstat -au</h3>
+<pre><code># netstat -au
+ Active Internet connections (servers and established)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ udp        0      0 *:bootpc                *:*
+ udp        0      0 *:49119                 *:*
+ udp        0      0 *:mdns                  *:*
+</code></pre>
+
+<p><strong>2. 列出所有处于监听状态的 Sockets</strong></p>
+<h3 id="netstat-l">只显示监听端口 netstat -l</h3>
+<pre><code># netstat -l
+ Active Internet connections (only servers)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ tcp        0      0 localhost:ipp           *:*                     LISTEN
+ tcp6       0      0 localhost:ipp           [::]:*                  LISTEN
+ udp        0      0 *:49119                 *:*
+</code></pre>
+
+<h3 id="tcp-netstat-lt">只列出所有监听 tcp 端口 netstat -lt</h3>
+<pre><code># netstat -lt
+ Active Internet connections (only servers)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ tcp        0      0 localhost:30037         *:*                     LISTEN
+ tcp        0      0 *:smtp                  *:*                     LISTEN
+ tcp6       0      0 localhost:ipp           [::]:*                  LISTEN
+</code></pre>
+
+<h3 id="udp-netstat-lu">只列出所有监听 udp 端口 netstat -lu</h3>
+<pre><code># netstat -lu
+ Active Internet connections (only servers)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ udp        0      0 *:49119                 *:*
+ udp        0      0 *:mdns                  *:*
+</code></pre>
+
+<h3 id="unix-netstat-lx">只列出所有监听 UNIX 端口 netstat -lx</h3>
+<pre><code># netstat -lx
+ Active UNIX domain sockets (only servers)
+ Proto RefCnt Flags       Type       State         I-Node   Path
+ unix  2      [ ACC ]     STREAM     LISTENING     6294     private/maildrop
+ unix  2      [ ACC ]     STREAM     LISTENING     6203     public/cleanup
+ unix  2      [ ACC ]     STREAM     LISTENING     6302     private/ifmail
+ unix  2      [ ACC ]     STREAM     LISTENING     6306     private/bsmtp
+</code></pre>
+
+<p><strong>3. 显示每个协议的统计信息</strong></p>
+<h3 id="netstat-s">显示所有端口的统计信息 netstat -s</h3>
+<pre><code># netstat -s
+ Ip:
+ 11150 total packets received
+ 1 with invalid addresses
+ 0 forwarded
+ 0 incoming packets discarded
+ 11149 incoming packets delivered
+ 11635 requests sent out
+ Icmp:
+ 0 ICMP messages received
+ 0 input ICMP message failed.
+ Tcp:
+ 582 active connections openings
+ 2 failed connection attempts
+ 25 connection resets received
+ Udp:
+ 1183 packets received
+ 4 packets to unknown port received.
+
+</code></pre>
+
+<h3 id="tcp-udp-netstat-st-su">显示 TCP 或 UDP 端口的统计信息 netstat -st 或 -su</h3>
+<pre><code># netstat -st 
+# netstat -su
+</code></pre>
+
+<p><strong>4. 在 netstat 输出中显示 PID 和进程名称 netstat -p</strong></p>
+<p>netstat -p 可以与其它开关一起使用，就可以添加 “PID/进程名称” 到 netstat 输出中，这样 debugging 的时候可以很方便的发现特定端口运行的程序</p>
+<pre><code># netstat -pt
+ Active Internet connections (w/o servers)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+ tcp        1      0 ramesh-laptop.loc:47212 192.168.185.75:www        CLOSE_WAIT  2109/firefox
+ tcp        0      0 ramesh-laptop.loc:52750 lax:www ESTABLISHED 2109/firefox
+</code></pre>
+
+<p><strong>5. 在 netstat 输出中不显示主机，端口和用户名 (host, port or user)</strong>
+当你不想让主机，端口和用户名显示，使用 netstat -n。将会使用数字代替那些名称。</p>
+<p>同样可以加速输出，因为不用进行比对查询。</p>
+<pre><code># netstat -an
+</code></pre>
+
+<p>如果只是不想让这三个名称中的一个被显示，使用以下命令</p>
+<pre><code># netsat -a --numeric-ports
+# netsat -a --numeric-hosts
+# netsat -a --numeric-users
+</code></pre>
+
+<p><strong>6. 持续输出 netstat 信息</strong>
+netstat 将每隔一秒输出网络信息。</p>
+<pre><code># netstat -c
+ Active Internet connections (w/o servers)
+ Proto Recv-Q Send-Q Local Address           Foreign Address         State
+ tcp        0      0 ramesh-laptop.loc:36130 101-101-181-225.ama:www ESTABLISHED
+ tcp        1      1 ramesh-laptop.loc:52564 101.11.169.230:www      CLOSING
+ tcp        0      0 ramesh-laptop.loc:43758 server-101-101-43-2:www ESTABLISHED
+ tcp        1      1 ramesh-laptop.loc:42367 101.101.34.101:www      CLOSING
+ ^C
+</code></pre>
+
+<p><strong>7. 显示系统不支持的地址族 (Address Families)</strong></p>
+<pre><code>netstat --verbose
+</code></pre>
+
+<p>在输出的末尾，会有如下的信息</p>
+<pre><code>netstat: no support for `AF IPX' on this system.
+netstat: no support for `AF AX25' on this system.
+netstat: no support for `AF X25' on this system.
+netstat: no support for `AF NETROM' on this system.
+</code></pre>
+
+<p><strong>8. 显示核心路由信息 netstat -r</strong></p>
+<pre><code># netstat -r
+ Kernel IP routing table
+ Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+ 192.168.1.0     *               255.255.255.0   U         0 0          0 eth2
+ link-local      *               255.255.0.0     U         0 0          0 eth2
+ default         192.168.1.1     0.0.0.0         UG        0 0          0 eth2
+</code></pre>
+
+<p>注意： 使用 netstat -rn 显示数字格式，不查询主机名称。</p>
+<p><strong>9. 找出程序运行的端口</strong>
+并不是所有的进程都能找到，没有权限的会不显示，使用 root 权限查看所有的信息。</p>
+<pre><code># netstat -ap | grep ssh
+ tcp        1      0 dev-db:ssh           101.174.100.22:39213        CLOSE_WAIT  -
+ tcp        1      0 dev-db:ssh           101.174.100.22:57643        CLOSE_WAIT  -
+</code></pre>
+
+<p>找出运行在指定端口的进程
+ <code># netstat -an | grep ':80'</code></p>
+<p><strong>10. 显示网络接口列表</strong></p>
+<p><code># netstat -i
+ Kernel Interface table
+ Iface   MTU Met   RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+ eth0       1500 0         0      0      0 0             0      0      0      0 BMU
+ eth2       1500 0     26196      0      0 0         26883      6      0      0 BMRU
+ lo        16436 0         4      0      0 0             4      0      0      0 LRU</code></p>
+<p>显示详细信息，像是 ifconfig 使用 netstat -ie:
+ <code># netstat -ie
+ Kernel Interface table
+ eth0      Link encap:Ethernet  HWaddr 00:10:40:11:11:11
+ UP BROADCAST MULTICAST  MTU:1500  Metric:1
+ RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+ TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+ collisions:0 txqueuelen:1000
+ RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+ Memory:f6ae0000-f6b00000</code></p>
+<p><strong>11. IP和TCP分析</strong></p>
+<p>查看连接某服务端口最多的的IP地址
+ <code>wss8848@ubuntu:~$ netstat -nat | grep "192.168.1.15:22" |awk '{print $5}'|awk -F: '{print $1}'|sort|uniq -c|sort -nr|head -20
+18 221.136.168.36
+3 154.74.45.242
+2 78.173.31.236
+2 62.183.207.98
+2 192.168.1.14
+2 182.48.111.215
+2 124.193.219.34
+2 119.145.41.2
+2 114.255.41.30
+1 75.102.11.99</code></p>
+<p>TCP各种状态列表</p>
+<pre><code>wss8848@ubuntu:~$ netstat -nat |awk '{print $6}'
+established)
+Foreign
+LISTEN
+TIME_WAIT
+ESTABLISHED
+TIME_WAIT
+SYN_SENT
+</code></pre></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+        <script src="../js/base.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>springboot - 张均的笔记</title>
+        <title>nginx安装 - 张均的笔记</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -139,12 +139,12 @@
 </li>
                         </ul>
                     </li>
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">spring <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
-<li class="active">
-    <a href="./">springboot</a>
+<li >
+    <a href="../springboot/">springboot</a>
 </li>
                             
 <li >
@@ -152,7 +152,7 @@
 </li>
                         </ul>
                     </li>
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Linux <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
@@ -160,8 +160,8 @@
     <a href="../linux/">netstat命令</a>
 </li>
                             
-<li >
-    <a href="../centos7-nginx/">nginx安装</a>
+<li class="active">
+    <a href="./">nginx安装</a>
 </li>
                         </ul>
                     </li>
@@ -174,12 +174,12 @@
                     </a>
                 </li>
                     <li >
-                        <a rel="next" href="../dbpool/">
+                        <a rel="next" href="../linux/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
-                    <li >
-                        <a rel="prev" href="../context/">
+                    <li class="disabled">
+                        <a rel="prev" >
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -191,67 +191,52 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#springboot">Springboot 优雅停机</a></li>
+        <li class="main active"><a href="#centos7-install-nginx">centos7 install nginx</a></li>
+            <li><a href="#1nginxyum">1.添加Nginx到YUM源</a></li>
+            <li><a href="#2nginx">2.安装Nginx</a></li>
+            <li><a href="#3nginx">3.启动Nginx</a></li>
+            <li><a href="#nginx">Nginx配置信息</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="springboot">Springboot 优雅停机</h1>
-<p>如何优雅地停止运行中的内嵌Tomcat的Spring Boot应用</p>
-<p>你很可能根据https://spring.io/guides/gs/rest-service/搭起了一个Spring的Rest服务，然后打包成了jar包，不需要容器就可以在生成环境下通过运行jar包启动一个Web服务。</p>
-<p>但这样的服务怎么样正确的停止呢？或许你只是简单的kill -9对应的进程，但实际上，有更优雅的方式。</p>
-<p>Spring Boot里面有一个spring-boot-starter-actuator的项目，可以监控和管理Spring Boot应用。其中暴露了很多endpoint,可以方便的检测应用的健康情况。其中有一个shutdown的endpoint可以优雅地停止应用。</p>
-<ul>
-<li>Maven基本配置</li>
-</ul>
-<p><strong>增加依赖</strong></p>
-<pre><code>&lt;dependency&gt;
-    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
-&lt;/dependency&gt;
+<h1 id="centos7-install-nginx">centos7 install nginx</h1>
+<h2 id="1nginxyum">1.添加Nginx到YUM源</h2>
+<p>添加CentOS 7 Nginx yum资源库,打开终端,使用以下命令:</p>
+<pre><code>sudo rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
 </code></pre>
 
-<p><strong>配置文件配置启用shutdown的HTTP访</strong></p>
-<pre><code>#启用 shutdown endpoint的HTTP访问
-endpoints.shutdown.enabled=true
-#不需要用户名密码验证 
-endpoints.shutdown.sensitive=false
+<h2 id="2nginx">2.安装Nginx</h2>
+<p>在你的CentOS 7 服务器中使用yum命令从Nginx源服务器中获取来安装Nginx：</p>
+<pre><code>sudo yum install -y nginx
 </code></pre>
 
-<p><strong>POST请求到shutdown路径</strong></p>
-<p>以上配置完成后，可以使用curl -X POST localhost:port/shutdown发动post请求，即可优雅的停止应用：</p>
-<pre><code>curl -X POST localhost:8088/manage/shutdown      
-{&quot;message&quot;:&quot;Shutting down, bye...&quot;}
+<p>Nginx将完成安装在你的CentOS 7 服务器中</p>
+<h2 id="3nginx">3.启动Nginx</h2>
+<p>刚安装的Nginx不会自行启动。运行Nginx:</p>
+<pre><code>sudo systemctl start nginx.service
 </code></pre>
 
-<p><strong>密码安全配置</strong></p>
-<p>若需要安全验证，则需要以下依赖：</p>
-<pre><code>&lt;dependency&gt;
-  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-  &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
-&lt;/dependency&gt;
+<p>如果一切进展顺利的话，现在你可以通过你的域名或IP来访问你的Web页面来预览一下Nginx的默认页面；</p>
+<h2 id="nginx">Nginx配置信息</h2>
+<p>网站文件存放默认目录</p>
+<pre><code>/usr/share/nginx/html
 </code></pre>
 
-<p>并配置你想要密码验证的endpoint的sensitive=true.</p>
-<pre><code>endpoints.shutdown.sensitive=true
+<p>网站默认站点配置</p>
+<pre><code>/etc/nginx/conf.d/default.conf
 </code></pre>
 
-<p>在application.properties文件配置对应的密码：</p>
-<pre><code>security.user.name=admin
-security.user.password=secret
-management.security.role=SUPERUSER
+<p>自定义Nginx站点配置文件存放目录</p>
+<pre><code>/etc/nginx/conf.d/
 </code></pre>
 
-<p><strong>路径/端口/ip访问限制</strong></p>
-<p>很可能这种监控你只需要在本机访问（如只有本机才能关闭应用），若需要如此，可以考虑以下管理配置</p>
-<pre><code>##management endpoint的路径，默认为/
-management.context-path=/manage
+<p>Nginx全局配置</p>
+<pre><code>/etc/nginx/nginx.conf
+</code></pre>
 
-##management endpoint的监听端口
-management.port=8081
-
-##management endpoint只允许来自本机的连接
-management.address=127.0.0.1
+<p>Nginx启动</p>
+<pre><code>nginx -c nginx.conf
 </code></pre></div>
         </div>
 

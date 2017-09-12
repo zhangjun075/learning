@@ -27,6 +27,6 @@ pages:
         - springboot : springboot.md
         - springcontext: context.md
     - Linux :
-        - netstat命令 : linux.md
+        - linux命令 : linux.md
         - nginx安装 : centos7-nginx.md 
 #theme: readthedocs

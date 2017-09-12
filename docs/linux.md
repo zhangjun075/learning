@@ -284,3 +284,12 @@ SYN_SENT
 ```
 
 
+# 新增用户&用户组
+
+* 因为安全问题elasticsearch 不让用root用户直接运行，所以要创建新用户
+* 第一步：liunx创建新用户  adduser XXX    然后给创建的用户加密码 passwd XXX    输入两次密码。
+* 第二步：切换刚才创建的用户 su XXX  然后执行elasticsearch  会显示Permission denied 权限不足。
+* 第三步：root给XXX赋权限，chown -R XXX /你的elasticsearch安装目录。
+
+然后执行成功。
+

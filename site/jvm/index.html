@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>springboot - 张均的笔记</title>
+        <title>jvm内存分析 - 张均的笔记</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -89,7 +89,7 @@
 </li>
                         </ul>
                     </li>
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">java <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
@@ -121,8 +121,8 @@
     <a href="../javassit/">代理(字节码)</a>
 </li>
                             
-<li >
-    <a href="../jvm/">jvm内存分析</a>
+<li class="active">
+    <a href="./">jvm内存分析</a>
 </li>
                         </ul>
                     </li>
@@ -139,12 +139,12 @@
 </li>
                         </ul>
                     </li>
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">spring <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
-<li class="active">
-    <a href="./">springboot</a>
+<li >
+    <a href="../springboot/">springboot</a>
 </li>
                             
 <li >
@@ -174,12 +174,12 @@
                     </a>
                 </li>
                     <li >
-                        <a rel="next" href="../dbpool/">
+                        <a rel="next" href="../javassit/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../context/">
+                        <a rel="prev" href="../trans/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -191,68 +191,85 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#springboot">Springboot 优雅停机</a></li>
+        <li class="main active"><a href="#jvm">jvm 内存分析</a></li>
+            <li><a href="#jmap">jmap</a></li>
+            <li><a href="#jstat">jstat</a></li>
+            <li><a href="#_1">示例</a></li>
+            <li><a href="#jvm_1">查看jvm进程中线程占用</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="springboot">Springboot 优雅停机</h1>
-<p>如何优雅地停止运行中的内嵌Tomcat的Spring Boot应用</p>
-<p>你很可能根据https://spring.io/guides/gs/rest-service/搭起了一个Spring的Rest服务，然后打包成了jar包，不需要容器就可以在生成环境下通过运行jar包启动一个Web服务。</p>
-<p>但这样的服务怎么样正确的停止呢？或许你只是简单的kill -9对应的进程，但实际上，有更优雅的方式。</p>
-<p>Spring Boot里面有一个spring-boot-starter-actuator的项目，可以监控和管理Spring Boot应用。其中暴露了很多endpoint,可以方便的检测应用的健康情况。其中有一个shutdown的endpoint可以优雅地停止应用。</p>
+<h1 id="jvm">jvm 内存分析</h1>
+<h2 id="jmap">jmap</h2>
+<p>通过jmap -heap pid,查看到的为JAVA堆内存(Young Gen+Old Gen)+Perm Gen</p>
+<h2 id="jstat">jstat</h2>
 <ul>
-<li>Maven基本配置</li>
+<li>
+<p>jstat命令命令格式：</p>
+<blockquote>
+<p>jstat [Options] vmid [interval] [count]</p>
+</blockquote>
+</li>
+<li>
+<p>参数说明</p>
+</li>
 </ul>
-<p><strong>增加依赖</strong></p>
-<pre><code>&lt;dependency&gt;
-    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
-&lt;/dependency&gt;
+<pre><code>Options，选项，我们一般使用 -gcutil 查看gc情况
+vmid，VM的进程号，即当前运行的java进程号
+interval，间隔时间，单位为秒或者毫秒
+count，打印次数，如果缺省则打印无数次
 </code></pre>
 
-<p><strong>配置文件配置启用shutdown的HTTP访</strong></p>
-<pre><code>#启用 shutdown endpoint的HTTP访问
-endpoints.shutdown.enabled=true
-#不需要用户名密码验证 
-endpoints.shutdown.sensitive=false
+<h2 id="_1">示例</h2>
+<p>jstat -gc 12538 5000</p>
+<p>即会每5秒一次显示进程号为12538的java进成的GC情况，
+<img alt="" src="images/gc.md" />
+显示内容说明如下（部分结果是通过其他其他参数显示的，暂不说明）：</p>
+<pre><code>S0C：年轻代中第一个survivor（幸存区）的容量 (字节) 
+         S1C：年轻代中第二个survivor（幸存区）的容量 (字节) 
+         S0U：年轻代中第一个survivor（幸存区）目前已使用空间 (字节) 
+         S1U：年轻代中第二个survivor（幸存区）目前已使用空间 (字节) 
+         EC：年轻代中Eden（伊甸园）的容量 (字节) 
+         EU：年轻代中Eden（伊甸园）目前已使用空间 (字节) 
+         OC：Old代的容量 (字节) 
+         OU：Old代目前已使用空间 (字节) 
+         PC：Perm(持久代)的容量 (字节) 
+         PU：Perm(持久代)目前已使用空间 (字节) 
+         YGC：从应用程序启动到采样时年轻代中gc次数 
+         YGCT：从应用程序启动到采样时年轻代中gc所用时间(s) 
+         FGC：从应用程序启动到采样时old代(全gc)gc次数 
+         FGCT：从应用程序启动到采样时old代(全gc)gc所用时间(s) 
+         GCT：从应用程序启动到采样时gc用的总时间(s) 
+         NGCMN：年轻代(young)中初始化(最小)的大小 (字节) 
+         NGCMX：年轻代(young)的最大容量 (字节) 
+         NGC：年轻代(young)中当前的容量 (字节) 
+         OGCMN：old代中初始化(最小)的大小 (字节) 
+         OGCMX：old代的最大容量 (字节) 
+         OGC：old代当前新生成的容量 (字节) 
+         PGCMN：perm代中初始化(最小)的大小 (字节) 
+         PGCMX：perm代的最大容量 (字节)   
+         PGC：perm代当前新生成的容量 (字节) 
+         S0：年轻代中第一个survivor（幸存区）已使用的占当前容量百分比 
+         S1：年轻代中第二个survivor（幸存区）已使用的占当前容量百分比 
+         E：年轻代中Eden（伊甸园）已使用的占当前容量百分比 
+         O：old代已使用的占当前容量百分比 
+         P：perm代已使用的占当前容量百分比 
+         S0CMX：年轻代中第一个survivor（幸存区）的最大容量 (字节) 
+         S1CMX ：年轻代中第二个survivor（幸存区）的最大容量 (字节) 
+         ECMX：年轻代中Eden（伊甸园）的最大容量 (字节) 
+         DSS：当前需要survivor（幸存区）的容量 (字节)（Eden区已满） 
+         TT： 持有次数限制 
+         MTT ： 最大持有次数限制 
 </code></pre>
 
-<p><strong>POST请求到shutdown路径</strong></p>
-<p>以上配置完成后，可以使用curl -X POST localhost:port/shutdown发动post请求，即可优雅的停止应用：</p>
-<pre><code>curl -X POST localhost:8088/manage/shutdown      
-{&quot;message&quot;:&quot;Shutting down, bye...&quot;}
-</code></pre>
-
-<p><strong>密码安全配置</strong></p>
-<p>若需要安全验证，则需要以下依赖：</p>
-<pre><code>&lt;dependency&gt;
-  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-  &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
-&lt;/dependency&gt;
-</code></pre>
-
-<p>并配置你想要密码验证的endpoint的sensitive=true.</p>
-<pre><code>endpoints.shutdown.sensitive=true
-</code></pre>
-
-<p>在application.properties文件配置对应的密码：</p>
-<pre><code>security.user.name=admin
-security.user.password=secret
-management.security.role=SUPERUSER
-</code></pre>
-
-<p><strong>路径/端口/ip访问限制</strong></p>
-<p>很可能这种监控你只需要在本机访问（如只有本机才能关闭应用），若需要如此，可以考虑以下管理配置</p>
-<pre><code>##management endpoint的路径，默认为/
-management.context-path=/manage
-
-##management endpoint的监听端口
-management.port=8081
-
-##management endpoint只允许来自本机的连接
-management.address=127.0.0.1
-</code></pre></div>
+<h2 id="jvm_1">查看jvm进程中线程占用</h2>
+<ul>
+<li>jps（查看java进程）</li>
+<li>top -Hp xxx(查看进程中线程的占用情况)</li>
+<li>printf "%x\n" xxx （查看16进制）</li>
+<li>jstack xxx |grep xxx（查看线程情况）</li>
+</ul></div>
         </div>
 
         <footer class="col-md-12">
