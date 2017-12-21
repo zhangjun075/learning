@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>netstat命令 - 张均的笔记</title>
+        <title>linux命令 - 张均的笔记</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -157,7 +157,7 @@
                         <ul class="dropdown-menu">
                             
 <li class="active">
-    <a href="./">netstat命令</a>
+    <a href="./">linux命令</a>
 </li>
                             
 <li >
@@ -195,6 +195,7 @@
             <li><a href="#_1">输出信息含义</a></li>
             <li><a href="#_2">常见参数</a></li>
             <li><a href="#_3">实用命令实例</a></li>
+        <li class="main "><a href="#_4">新增用户&amp;用户组</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
@@ -439,7 +440,16 @@ TIME_WAIT
 ESTABLISHED
 TIME_WAIT
 SYN_SENT
-</code></pre></div>
+</code></pre>
+
+<h1 id="_4">新增用户&amp;用户组</h1>
+<ul>
+<li>因为安全问题elasticsearch 不让用root用户直接运行，所以要创建新用户</li>
+<li>第一步：liunx创建新用户  adduser XXX    然后给创建的用户加密码 passwd XXX    输入两次密码。</li>
+<li>第二步：切换刚才创建的用户 su XXX  然后执行elasticsearch  会显示Permission denied 权限不足。</li>
+<li>第三步：root给XXX赋权限，chown -R XXX /你的elasticsearch安装目录。</li>
+</ul>
+<p>然后执行成功。</p></div>
         </div>
 
         <footer class="col-md-12">

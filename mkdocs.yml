@@ -29,4 +29,6 @@ pages:
     - Linux :
         - linux命令 : linux.md
         - nginx安装 : centos7-nginx.md 
+    - 踩坑 :
+        - produces和consumes注解 : restful/remark-restful-request.md
 #theme: readthedocs
