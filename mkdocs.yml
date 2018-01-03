@@ -32,4 +32,6 @@ pages:
     - 踩坑 :
         - produces和consumes注解 : restful/remark-restful-request.md
         - jenkins使用 : jenkins/jenkins.md
+    - cicd :
+        - jenkins ci: jenkins/jenkins-ci.md
 #theme: readthedocs
