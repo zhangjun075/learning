@@ -31,4 +31,5 @@ pages:
         - nginx安装 : centos7-nginx.md 
     - 踩坑 :
         - produces和consumes注解 : restful/remark-restful-request.md
+        - jenkins使用 : jenkins/jenkins.md
 #theme: readthedocs

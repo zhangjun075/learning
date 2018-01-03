@@ -11,7 +11,7 @@
     - 请求用requestParam来注解。默认会在请求参数后面加上?userId={userId}。
     - 对于produces和consumes的理解，请看如下截图。
 
-![](../images/comsumes1.png)
+![](../images/comsumes1.jpeg)
 
 所以，从这里可以看出对于请求方注解produces，代表的是http报文头重的Accept。而consumes代表的是http报文头重的Content-type。
 
