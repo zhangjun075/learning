@@ -20,6 +20,7 @@ pages:
         - 令牌桶 : limiting.md
         - 代理(字节码) : javassit.md
         - jvm内存分析 : jvm.md
+        - BeanPostProcessor : BeanPostProcessor.md
     - 数据库 :
         - db事务 : trans.md
         - 连接池 : dbpool.md
@@ -34,4 +35,5 @@ pages:
         - jenkins使用 : jenkins/jenkins.md
     - cicd :
         - jenkins ci: jenkins/jenkins-ci.md
+        - jenkins cd: jenkins/jenkins-cd.md
 #theme: readthedocs
