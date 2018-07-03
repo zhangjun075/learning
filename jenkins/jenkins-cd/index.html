@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>jenkins ci - 张均的笔记</title>
+        <title>jenkins cd - 张均的笔记</title>
         <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -186,12 +186,12 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">cicd <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
-<li class="active">
-    <a href="./">jenkins ci</a>
+<li >
+    <a href="../jenkins-ci/">jenkins ci</a>
 </li>
                             
-<li >
-    <a href="../jenkins-cd/">jenkins cd</a>
+<li class="active">
+    <a href="./">jenkins cd</a>
 </li>
                         </ul>
                     </li>
@@ -204,12 +204,12 @@
                     </a>
                 </li>
                     <li >
-                        <a rel="next" href="../jenkins/">
+                        <a rel="next" href="../jenkins-ci/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
-                    <li >
-                        <a rel="prev" href="../jenkins-cd/">
+                    <li class="disabled">
+                        <a rel="prev" >
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -221,119 +221,14 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#ci">CI 说明</a></li>
-            <li><a href="#jenkins">jenkins安装</a></li>
-            <li><a href="#ci_1">ci配置</a></li>
-            <li><a href="#_2">最终效果</a></li>
+        <li class="main active"><a href="#cd">cd说明</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="ci">CI 说明</h1>
-<p>请参见<a href="https://jenkins.io/doc/pipeline/tour/getting-started/">jenkins官网</a></p>
-<h2 id="jenkins">jenkins安装</h2>
-<h3 id="_1">两种方式</h3>
-<ul>
-<li>docker方式-建议安装<a href="https://jenkins.io/doc/book/blueocean/getting-started/#blueocean-docker">blue ocean版本</a></li>
-<li>war包方式，单点部署。启动命令：java -jar -DhttpPort=8080 -Dhudson.util.ProcessTree.disable=true  jenkins.war</li>
-</ul>
-<h3 id="docker">docker启动命令</h3>
-<p>可以参见官网的启动方式
-<img alt="" src="../../images/docker-install.png" /></p>
-<p>这里需要指定好jenkins的目录，和本地目录的映射关系。如我本地就是
-<img alt="" src="../../images/dir-docker.png" /></p>
-<p>安装完成后，和本地使用没有什么区别了。</p>
-<h2 id="ci_1">ci配置</h2>
-<h3 id="jenkins_1">jenkins配置：</h3>
-<ul>
-<li>step1: jenkins主页面-&gt;new item</li>
-<li>step2: 填写项目名字,选择pipeline</li>
-<li>step3: 进入主页面，安装几个插件：gitlab plugin 还有一个是gitlab hook plugin。</li>
-<li>step4: 在刚才的item的配置页面，进入build triggers</li>
-<li>step5: 选择“uild when a change is pushed to GitLab. GitLab CI Service URL: http://localhost:8080/project/datasource-demo”</li>
-<li>在pipline中选择script,具体的变量自己按照机器定义</li>
-</ul>
-<pre><code>node {
-   def mvnHome
-   stage('Preparation') { // for display purposes
-      // Get some code from a GitHub repository
-      git 'http://gitlab.paifenlecorp.com/tars/tars-datainfo.git'
-      // Get the Maven tool.
-      // ** NOTE: This 'M3' Maven tool must be configured
-      // **       in the global configuration.           
-      mvnHome = '/usr/local/maven/apache-maven-3.3.9'
-   }
-   stage('Build') {
-      // Run the maven build
-      if (isUnix()) {
-         sh &quot;'${mvnHome}/bin/mvn' -Dmaven.test.failure.ignore clean package&quot;
-      } else {
-         bat(/&quot;${mvnHome}\bin\mvn&quot; -Dmaven.test.failure.ignore clean package/)
-      }
-   }
-   stage('run') {
-       sh &quot;/Users/junzhang/Downloads/jenkins-shell/stop.sh&quot;
-       sh &quot;/Users/junzhang/Downloads/jenkins-shell/replace.sh&quot;
-       sh &quot;/Users/junzhang/Downloads/jenkins-shell/startup.sh&quot;
-
-   }
-}
-</code></pre>
-
-<ul>
-<li>stop脚本</li>
-</ul>
-<pre><code># 将应用停止
-#stop.sh
-#!/bin/bash
-echo &quot;Stopping SpringBoot Application&quot;
-pid=`ps -ef | grep demo.jar | grep -v grep | awk '{print $2}'`
-if [ -n &quot;$pid&quot; ]
-then
-   kill -9 $pid
-fi
-</code></pre>
-
-<ul>
-<li>replace脚本</li>
-</ul>
-<pre><code>#replace.sh 用于将上次构建的结果备份，然后将新的构建结果移动到合适的位置
-#!/bin/bash
-# 先判断文件是否存在，如果存在，则备份
-cd /Users/junzhang/.jenkins/workspace/datasource-demo/
-#mvn clean install -Dmaven.test.skip
-file=&quot;/usr/local/SBA/model.jar&quot;
-if [ -f &quot;$file&quot; ]
-then
-   mv /Users/junzhang/.jenkins/workspace/datasource-demo/target/tars-datainfo-1.0-SNAPSHOT.jar  /Users/junzhang/Downloads/jenkins-shell/demo.jar.`date +%Y%m%d%H%M%S`
-fi
-mv /Users/junzhang/.jenkins/workspace/datasource-demo/target/tars-datainfo-1.0-SNAPSHOT.jar  /Users/junzhang/Downloads/jenkins-shell/demo.jar
-
-</code></pre>
-
-<ul>
-<li>startup脚本</li>
-</ul>
-<pre><code># startup.sh 启动项目
-#!/bin/sh
-echo &quot;授予当前用户权限&quot;
-chmod 777 /Users/junzhang/Downloads/jenkins-shell/demo.jar
-echo &quot;执行.....&quot;
-BUILD_ID=dontKillMe nohup java -jar  /Users/junzhang/Downloads/jenkins-shell/demo.jar  &gt; server.log 2&gt;&amp;1 &amp;
-</code></pre>
-
-<h3 id="gitlab">gitlab配置</h3>
-<ul>
-<li>进入项目的配置页面，选择webhooks
-<img alt="" src="../../images/gitlab.png" /></li>
-<li>新建一个webhook
-<img alt="" src="../../images/webhook.png" /></li>
-</ul>
-<h2 id="_2">最终效果</h2>
-<p>在gitlab上提交一个代码这个时候会自动触发
-<img alt="" src="../../images/ci.png" /></p>
-<p>在blue ocean上也能看到编译的步骤：
-<img alt="" src="../../images/ocean.png" /></p></div>
+<h1 id="cd">cd说明</h1>
+<p>采用jenkins的话，需要安装publis over ssh的插件。
+或者采用<a href="http://www.hypexr.org/linux_scp_help.php">scp命令</a>在groovy中写脚本执行。</p></div>
         </div>
 
         <footer class="col-md-12">

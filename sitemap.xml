@@ -4,7 +4,7 @@
     
     <url>
      <loc>/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -13,19 +13,19 @@
         
     <url>
      <loc>/microservice/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/restfulapi/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/feign-problem/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
@@ -34,7 +34,7 @@
     
     <url>
      <loc>/designPattern/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -43,25 +43,25 @@
         
     <url>
      <loc>/docker/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/mysql-docker/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/nginx/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/docker0/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
@@ -71,49 +71,55 @@
         
     <url>
      <loc>/thread/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/lambda/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/JSR310/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/gc/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/swagger/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/limiting/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/javassit/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/jvm/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/BeanPostProcessor/</loc>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
@@ -123,13 +129,13 @@
         
     <url>
      <loc>/trans/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/dbpool/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
@@ -139,13 +145,13 @@
         
     <url>
      <loc>/springboot/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/context/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
@@ -155,13 +161,13 @@
         
     <url>
      <loc>/linux/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/centos7-nginx/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
@@ -171,13 +177,13 @@
         
     <url>
      <loc>/restful/remark-restful-request/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
      <loc>/jenkins/jenkins/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
@@ -187,7 +193,13 @@
         
     <url>
      <loc>/jenkins/jenkins-ci/</loc>
-     <lastmod>2018-01-03</lastmod>
+     <lastmod>2018-07-03</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/jenkins/jenkins-cd/</loc>
+     <lastmod>2018-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
         

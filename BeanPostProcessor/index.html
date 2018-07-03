@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../img/favicon.ico">
-        <title>db事务 - 张均的笔记</title>
+        <title>BeanPostProcessor - 张均的笔记</title>
         <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
         <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
         <link href="../css/base.css" rel="stylesheet">
@@ -89,7 +89,7 @@
 </li>
                         </ul>
                     </li>
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">java <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
@@ -125,17 +125,17 @@
     <a href="../jvm/">jvm内存分析</a>
 </li>
                             
-<li >
-    <a href="../BeanPostProcessor/">BeanPostProcessor</a>
+<li class="active">
+    <a href="./">BeanPostProcessor</a>
 </li>
                         </ul>
                     </li>
-                    <li class="dropdown active">
+                    <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">数据库 <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             
-<li class="active">
-    <a href="./">db事务</a>
+<li >
+    <a href="../trans/">db事务</a>
 </li>
                             
 <li >
@@ -204,12 +204,12 @@
                     </a>
                 </li>
                     <li >
-                        <a rel="next" href="../BeanPostProcessor/">
+                        <a rel="next" href="../jvm/">
                             <i class="fa fa-arrow-left"></i> Previous
                         </a>
                     </li>
                     <li >
-                        <a rel="prev" href="../dbpool/">
+                        <a rel="prev" href="../trans/">
                             Next <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -221,84 +221,74 @@
         <div class="container">
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#acid-propagation">ACID Propagation</a></li>
+        <li class="main active"><a href="#beanpostprocessor">BeanPostProcessor使用</a></li>
+            <li><a href="#-">简介-摘录自网上</a></li>
+            <li><a href="#_1">使用说明</a></li>
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h1 id="acid-propagation">ACID Propagation</h1>
-<p><strong>数据库事务的四个基本性质简介</strong></p>
-<ul>
-<li>原子性（Atomicity），在一个事务中的所有操作，相当于一个原子操作，要么全部成功，要么全部失败。</li>
-<li>一致性（Consistency），就是在事务执行前后，对于事务本身的用意而言，数据库中的数据是保持一致的，数据库的一致性是建立在原子性的基础之上的，更多的由编码的程序员保证，最经典的案例是A，B帐号之间的转账。</li>
-<li>隔离性（Isolation），事务的隔离性是指事务和事务之间的数据可见性，这也是本文需要详细介绍的地方。数据库定义了各种隔离级别，以在并发性和数据完整性中权衡。</li>
-<li>持久性（Durability），事务完成以后，所有的数据都将持久到数据库中，不会因为其他原因而丢失。</li>
-</ul>
-<p><strong>数据据库并发性带来的问题：</strong></p>
-<ul>
-<li>脏读（Dirty Reads）：所谓脏读就是对脏数据（Drity Data）的读取，而脏数据所指的就是未提交的数据。也就是说，一个事务正在对一条记录做修改，在这个事务完成并提交之前，这条数据是处于待定状态的（可能提交也可能回滚），这时，第二个事务来读取这条没有提交的数据，并据此做进一步的处理，就会产生未提交的数据依赖关系。这种现象被称为脏读。</li>
-<li>不可重复读（Non-Repeatable Reads）：一个事务先后读取同一条记录，但两次读取的数据不同，我们称之为不可重复读。也就是说，这个事务在两次读取之间该数据被其它事务所修改。</li>
-<li>幻读（Phantom Reads）：一个事务按相同的查询条件重新读取以前检索过的数据，却发现其他事务插入了满足其查询条件的新数据，这种现象就称为幻读。</li>
-</ul>
-<p><strong>事务的隔离级别</strong></p>
-<p>数据库的隔离级别主要分为四级，隔离级别越高，并发性就越低，一致性就越高。</p>
-<p>数据库事务的四个基本性质简介</p>
-<p>原子性（Atomicity），在一个事务中的所有操作，相当于一个原子操作，要么全部成功，要么全部失败。
-一致性（Consistency），就是在事务执行前后，对于事务本身的用意而言，数据库中的数据是保持一致的，数据库的一致性是建立在原子性的基础之上的，更多的由编码的程序员保证，最经典的案例是A，B帐号之间的转账。
-隔离性（Isolation），事务的隔离性是指事务和事务之间的数据可见性，这也是本文需要详细介绍的地方。数据库定义了各种隔离级别，以在并发性和数据完整性中权衡。
-持久性（Durability），事务完成以后，所有的数据都将持久到数据库中，不会因为其他原因而丢失。</p>
-<p>数据据库并发性带来的问题：</p>
-<p>脏读（Dirty Reads）：所谓脏读就是对脏数据（Drity Data）的读取，而脏数据所指的就是未提交的数据。也就是说，一个事务正在对一条记录做修改，在这个事务完成并提交之前，这条数据是处于待定状态的（可能提交也可能回滚），这时，第二个事务来读取这条没有提交的数据，并据此做进一步的处理，就会产生未提交的数据依赖关系。这种现象被称为脏读。
-不可重复读（Non-Repeatable Reads）：一个事务先后读取同一条记录，但两次读取的数据不同，我们称之为不可重复读。也就是说，这个事务在两次读取之间该数据被其它事务所修改。
-幻读（Phantom Reads）：一个事务按相同的查询条件重新读取以前检索过的数据，却发现其他事务插入了满足其查询条件的新数据，这种现象就称为幻读。</p>
-<p>事务的隔离级别</p>
-<p>数据库的隔离级别主要分为四级，隔离级别越高，并发性就越低，一致性就越高。</p>
-<p>1、读未提交 （Read UnCommited）</p>
-<p>这是数据库最弱的隔离级别（完全不隔离），存在脏读、不可重复读、幻读的诸多问题。示例如下：
-<img alt="" src="../images/read_uncommited.png" /></p>
-<p>由于事务B读取了事务未提交的数据，一旦回滚，事务B读取的数据就是有问题的。</p>
-<p>2、读已提交（Read Commited）</p>
-<p>这个级别不允许事务B读取事务A还未提交的update操作更新后的数据（对于事务A的insert操作，在未提交之前，对事务B还是可见的）。避免了脏读，但还可能出现不可重复读、幻读。示例如下：
-<img alt="" src="../images/read_commited.png" /></p>
-<p>这里面不会出现脏读，保证事务B读取的都是事务A update提交之后的数据。但是事务之间还是会存在互相影响的情况（不可重复读），见下面的例子：
-<img alt="" src="../images/read_commited1.png" /></p>
-<p>事务A和事务B都是先读取Price的价格，然后在价格上面减去一定的数值，我们期望结果是70，但是实际结果可能是90，也可能是80。</p>
-<p>3、可重复读（Repeatable Read）</p>
-<p>所有被Select获取的数据都不能被修改，这样就可以避免一个事务前后读取数据不一致的情况。但是却没有办法控制幻读，因为这个时候其他事务不能更改所选的数据，但是可以增加数据，因为前一个事务没有范围锁。
-<img alt="" src="../images/repeatable.png" /></p>
-<p>该隔离级别消除了不可重复读，但因为对于事务A的insert操作事务B还是可见的，所以是还是存在幻读的现象。
-<img alt="" src="../images/repeatable1.png" /></p>
-<p>4、可序列化读（Serialize）</p>
-<p>事务之间最高的隔离界别，只能顺序的读取数据，当一个事务在读取和修改数据的时候，另外一个事务只能挂起，直到正在读取和修改数据的事务提交之后，挂起的事务才能执行。
-<img alt="" src="../images/seri.png" /></p>
-<p>以上这些隔离级别都是定义在java.sql. Connection中，在获取连接的时候我们可以进行设置，但是一般情况下，系统会用数据库默认的级别来设置。</p>
-<ul>
-<li>Connection.TRANSACTION_READ_UNCOMMITTED;</li>
-<li>Connection.TRANSACTION_READ_COMMITTED;</li>
-<li>Connection.TRANSACTION_REPEATABLE_READ;</li>
-<li>Connection.TRANSACTION_SERIALIZABLE;</li>
-</ul>
-<p>小结：
-<img alt="" src="../images/summary.png" /></p>
-<p><strong>事务的传播属性</strong></p>
-<p>我们在使用Spring或者EJB声明式编程的时候，还会接触到事务的传播属性（Propagation），在spring的 TransactionDefinition 类里面进行定义。具体有以下几个数值：</p>
-<ul>
-<li>Required(需要)</li>
-<li>Mandatory(强制必须)</li>
-<li>RequiresNew(需要新的)</li>
-<li>Supports(支持)</li>
-<li>NotSupported(不支持)</li>
-<li>Never(不用)</li>
-</ul>
-<p>Required：当前方法必须要求开启事务，如果当前线程不存在事务，则开启新的事务，如果当前线程已经存在事务，就加入到当前事务。这个是经常使用的。但是要注意的就是一旦事务中某一个方法回滚，当前事务上下文里面所有的操作都回滚，考虑到下面一个例子：
-<img alt="" src="../images/required.png" /></p>
-<p>假设A和B的事务都是Required，那么当调用MethodA的时候，如果methodB回滚了，对A的修改也就回滚了。所以上面的代码不会达到预期的结果，也就是说A不可能修改成为99。</p>
-<p>Required New：当前方法必须要求开启新的事务，如果当前线程已经存在事务上下文，就暂停当前事务，等到新事务结束之后，再继续恢复之前的事务。就拿上面的例子来说，methodB的对事务的修改不会影响到methodA。两个事务之间不会互相影响。经常可以用到的场景就是在业务发生异常的时候发送短消息。如果业务发生异常，业务回滚，但是由于发送段消息是新的事务，不会受到业务异常的影响。</p>
-<p>Mondary：当前方法必须要求事务，如果当前线程不存在事务，就抛出异常，如果存在，就加入到事务里。</p>
-<p>Support：当前方法支持事务，如果当前线程存在事务，就加入到事务中去，如果不存在，不做任何操作。</p>
-<p>Not Support：当前方法不支持事务，如果当前线程存在事务，就挂起当前事务，执行完当前方法，恢复事务。一般情况下在查询的时候使用，如果一个方法只是查询，并且非常耗时，就可以使用Not Support，避免事务时间超长。</p>
-<p>Never：当前方法不支持事务，如果当前线程存在事务，则抛出异常。这种用的比较少。</p>
-<p><strong>PSCache内存占用优化对于支持游标的数据库（Oracle、SQL Server、DB2等，不包括MySql）:druid</strong></p></div>
+<h1 id="beanpostprocessor">BeanPostProcessor使用</h1>
+<h2 id="-">简介-摘录自网上</h2>
+<p>BeanPostProcessor是Spring中定义的一个接口，其与之前介绍的InitializingBean和DisposableBean接口类似，也是供Spring进行回调的。Spring将在初始化bean前后对BeanPostProcessor实现类进行回调，与InitializingBean和DisposableBean接口不同的是BeanPostProcessor接口将对所有的bean都起作用，即所有的bean初始化前后都会回调BeanPostProcessor实现类，而InitializingBean和DisposableBean接口是针对单个bean的，即只有在对应的bean实现了InitializingBean或DisposableBean接口才会对其进行回调。</p>
+<pre><code>public interface BeanPostProcessor {
+
+    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
+
+    Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
+
+}
+</code></pre>
+
+<h2 id="_1">使用说明</h2>
+<p>开发过程中，在实现一个自定义注解：</p>
+<pre><code>Component
+@Slf4j
+public class MyValueAspect implements BeanPostProcessor {
+
+    @Override public Object postProcessBeforeInitialization(Object bean, String beanName)
+        throws BeansException {
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName)
+        throws BeansException {
+
+        if(bean instanceof DemoService) {
+            Field[] fields = bean.getClass().getFields();
+            if(fields != null) {
+                for(Field field : fields) {
+                    MyValue myValue = AnnotationUtils.findAnnotation(field,MyValue.class);
+                    if(myValue != null) {
+                        String name = myValue.name();
+                        field.setAccessible(true);
+                        try {
+                            field.set(bean,name);
+                            field.setAccessible(false);
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        return bean;
+    }
+
+</code></pre>
+
+<p>理论上，这个时候容器中的bean会发生改变，如下图：
+<img alt="" src="../images/WechatIMG76.jpeg" />
+但是，实际在获取DemoService这个对应的属性aaa的时候，是空，如下是调试过程：
+<img alt="" src="../images/WechatIMG84.jpeg" />
+<img alt="" src="../images/WechatIMG88.jpeg" />
+<img alt="" src="../images/WechatIMG91.jpeg" />
+<img alt="" src="../images/WechatIMG93.jpeg" /></p>
+<p>后面发现，demoService层做了aspect。也就是说，这个时候改变的是代理类的属性，没有改变本身父类的属性。去掉了aop后，一切正常。</p></div>
         </div>
 
         <footer class="col-md-12">
